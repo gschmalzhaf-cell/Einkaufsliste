@@ -39,24 +39,24 @@ jobs:
           exit 1
 
       - name: APK umbenennen
-        run: cp app/build/outputs/apk/release/app-release.apk Einkaufsliste-v1.0.apk
+        run: cp app/build/outputs/apk/release/app-release.apk Einkaufsliste-v1.1.apk
 
       - name: APK als Artefakt hochladen
         uses: actions/upload-artifact@v4
         with:
           name: Einkaufsliste-APK
-          path: Einkaufsliste-v1.0.apk
+          path: Einkaufsliste-v1.1.apk
           retention-days: 30
 
       - name: Changelog des aktuellen Releases extrahieren
         run: awk '/^## /{n++} n==1' CHANGELOG.md > release-notes.md
 
-      - name: GitHub Release v1.0 mit Changelog erstellen
+      - name: GitHub Release v1.1 mit Changelog erstellen
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v1.0 Einkaufsliste-v1.0.apk \
-            --title "Einkaufsliste v1.0" \
+          gh release create v1.1 Einkaufsliste-v1.1.apk \
+            --title "Einkaufsliste v1.1" \
             --target main \
             --notes-file release-notes.md \
-            2>/dev/null || gh release upload v1.0 Einkaufsliste-v1.0.apk --clobber
+            2>/dev/null || gh release upload v1.1 Einkaufsliste-v1.1.apk --clobber
