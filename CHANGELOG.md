@@ -3,12 +3,26 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.6 – 2026-11-03
+
+Neu: Zu jedem Eintrag wird jetzt eine handelsübliche Packungsgröße (Rewe, Aldi) angezeigt, mit der der Rezept-Bedarf abgedeckt ist.
+
+### Neu
+- **Packungsgrößen-Hinweis**: Unter jedem Eintrag steht die übliche Supermarkt-Packung, die die benötigte Menge abdeckt – z. B. „200 g“ Mehl → „Handelsüblich: 500 g oder 1 kg Packung“. So weiß man beim Einkauf genau, was man greifen muss
+- **Rezept-Links und -texte**: Die KI liefert die passende Packungsgröße direkt für jede Zutat mit
+- **Foto**: Auch hier recherchiert die KI pro Artikel die handelsübliche Packung
+- **Manuell**: Beim Tippen erscheint sofort der Hinweis aus dem integrierten Katalog (rund 90 Grundzutaten mit Standard-Packungsgrößen von Rewe/Aldi); per Knopfdruck lässt sich die Packungsgröße zusätzlich per KI recherchieren
+- Ohne API-Schlüssel greift die App auf den Offline-Katalog zurück
+
+### Technisch
+- Datenbank erweitert (Version 2, automatische Migration) – bestehende Einträge bleiben erhalten
+
 ## v1.5 – 2026-11-03
 
 Behoben: Mengenangaben fehlten bei bestimmten Rezept-Links (u. a. Chefkoch und einfachbacken.de).
 
 ### Behoben
-- **Chefkoch-Rezepte**: Chefkoch lädt die Zutatennamen erst per JavaScript nach – statisch geladene Seiten enthalten sie nicht. Die App liest Chefkoch-Rezepte jetzt direkt über die öffentliche Chefkoch-API aus, die alle Zutaten mit exakten Mengen liefert (z. B. „200 g Zucker“, „0,5 Pck. Backpulver")
+- **Chefkoch-Rezepte**: Chefkoch lädt die Zutatennamen erst per JavaScript nach – statisch geladene Seiten enthalten sie nicht. Die App liest Chefkoch-Rezepte jetzt direkt über die öffentliche Chefkoch-API aus, die alle Zutaten mit exakten Mengen liefert (z. B. „200 g Zucker“, „0,5 Pck. Backpulver“)
 - **Seiten mit getrennten Mengen-Spalten** (z. B. einfachbacken.de): Wenn Menge und Artikel im Seitenlayout als eigene Elemente vorliegen, werden sie jetzt automatisch zu einer Zeile zusammengeführt („250 g“ + „weiche Butter“ → „250 g weiche Butter“)
 
 ## v1.4 – 2026-11-03
