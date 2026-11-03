@@ -5,10 +5,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-/** Lädt eine Rezept-Webseite und extrahiert den lesbaren Text daraus. */
+/**
+ * Laedt eine Rezept-Webseite und extrahiert daraus die Zutaten.
+ * Bevorzugt strukturierte Daten (Schema.org JSON-LD bzw. Microdata), da dort
+ * die Mengenangaben sauber und vollstaendig enthalten sind; sonst Fallback
+ * auf den lesbaren Seitentext.
+ */
 object WebRecipeFetcher {
 
     private val client = OkHttpClient.Builder()
@@ -17,7 +24,7 @@ object WebRecipeFetcher {
         .followRedirects(true)
         .build()
 
-    suspend fun fetch(url: String, maxChars: Int = 25_000): String = withContext(Dispatchers.IO) {
+    suspend fun fetch(url: String, maxChars: Int = 60_000): String = withContext(Dispatchers.IO) {
         val request = Request.Builder()
             .url(url)
             .header(
@@ -30,14 +37,59 @@ object WebRecipeFetcher {
 
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("HTTP ${response.code}")
-            extractText(response.body!!.string()).take(maxChars)
+            extractRecipeText(response.body!!.string()).take(maxChars)
         }
+    }
+
+    fun extractRecipeText(html: String): String {
+        extractJsonLdIngredients(html)?.let { return it.joinToString("\n") }
+        extractMicrodataIngredients(html)?.let { return it.joinToString("\n") }
+        return extractText(html)
+    }
+
+    private fun extractJsonLdIngredients(html: String): List<String>? {
+        val ingredients = mutableListOf<String>()
+        val blockRegex = Regex("""(?is)<script[^>]*type=["']application/ld\+json["'][^>]*>(.*?)</script>""")
+        blockRegex.findAll(html).forEach { match ->
+            try {
+                collectIngredients(JSONObject(match.groupValues[1].trim()), ingredients)
+            } catch (e: Exception) {
+            }
+        }
+        return ingredients.takeIf { it.isNotEmpty() }?.distinct()
+    }
+
+    private fun collectIngredients(node: Any?, out: MutableList<String>) {
+        when (node) {
+            is JSONObject -> {
+                node.optJSONArray("recipeIngredient")?.let { arr ->
+                    for (i in 0 until arr.length()) {
+                        arr.optString(i).trim().takeIf { it.isNotEmpty() }?.let(out::add)
+                    }
+                }
+                node.optJSONArray("@graph")?.let { graph ->
+                    for (i in 0 until graph.length()) collectIngredients(graph.opt(i), out)
+                }
+            }
+            is JSONArray -> for (i in 0 until node.length()) collectIngredients(node.opt(i), out)
+        }
+    }
+
+    private fun extractMicrodataIngredients(html: String): List<String>? {
+        val regex = Regex("""(?is)<[^>]*itemprop=["']recipeIngredient["'][^>]*>(.*?)</\w+>""")
+        val items = regex.findAll(html)
+            .map { extractText(it.groupValues[1]) }
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+            .toList()
+        return items.takeIf { it.isNotEmpty() }
     }
 
     fun extractText(html: String): String {
         val cleaned = html
-            .replace(Regex("(?is)<(script|style|noscript|head|nav|footer)[^>]*>.*?</\\1>"), " ")
-            .replace(Regex("(?i)<br\\s*/?>|</p>|</li>|</h[1-6]>"), "\n")
+            .replace(Regex("""(?is)<(script|style|noscript|head|nav|footer)[^>]*>.*?</\1>"""), " ")
+            .replace(Regex("""(?i)<br\s*/?>|</p>|</li>|</h[1-6]>"""), "\n")
             .replace(Regex("<[^>]+>"), " ")
         val decoded = Html.fromHtml(cleaned, Html.FROM_HTML_MODE_LEGACY).toString()
         return decoded.lines()
