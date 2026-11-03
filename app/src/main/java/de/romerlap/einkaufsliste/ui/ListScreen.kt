@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -47,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.ListViewModel
 import de.romerlap.einkaufsliste.data.ShoppingItem
 
@@ -57,9 +59,11 @@ fun ListScreen(viewModel: ListViewModel) {
     var showAddSheet by rememberSaveable { mutableStateOf(false) }
     var showManualDialog by rememberSaveable { mutableStateOf(false) }
     var showRecipeSheet by rememberSaveable { mutableStateOf(false) }
+    var showKeyDialog by rememberSaveable { mutableStateOf(false) }
     var photoResult by remember { mutableStateOf<Bitmap?>(null) }
 
     val context = LocalContext.current
+    val currentKey = remember { ApiKeyStore.get(context) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicturePreview()
@@ -91,6 +95,9 @@ fun ListScreen(viewModel: ListViewModel) {
                         IconButton(onClick = { viewModel.deleteChecked() }) {
                             Icon(Icons.Filled.DoneAll, contentDescription = "Erledigte entfernen")
                         }
+                    }
+                    IconButton(onClick = { showKeyDialog = true }) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Einstellungen")
                     }
                 }
             )
@@ -164,7 +171,12 @@ fun ListScreen(viewModel: ListViewModel) {
                     .padding(bottom = 4.dp),
                 leadingContent = { Icon(Icons.Filled.PhotoCamera, contentDescription = null) },
                 headlineContent = { Text("Per Foto") },
-                supportingContent = { Text("Liste oder Notiz abfotografieren") }
+                supportingContent = {
+                    Text(
+                        if (currentKey != null) "Abfotografieren, KI erkennt Artikel mit Menge"
+                        else "Abfotografieren, Text wird erkannt"
+                    )
+                }
             )
             ListItem(
                 modifier = Modifier
@@ -173,7 +185,12 @@ fun ListScreen(viewModel: ListViewModel) {
                     .padding(bottom = 24.dp),
                 leadingContent = { Icon(Icons.Filled.ReceiptLong, contentDescription = null) },
                 headlineContent = { Text("Aus Rezept") },
-                supportingContent = { Text("Rezepttext einfügen, Zutaten erkennen") }
+                supportingContent = {
+                    Text(
+                        if (currentKey != null) "Rezepttext einfügen, KI erkennt Zutaten"
+                        else "Rezepttext einfügen, Zutaten erkennen"
+                    )
+                }
             )
         }
     }
@@ -194,6 +211,17 @@ fun ListScreen(viewModel: ListViewModel) {
             onAdd = { drafts ->
                 viewModel.addAll(drafts)
                 showRecipeSheet = false
+            }
+        )
+    }
+
+    if (showKeyDialog) {
+        ApiKeyDialog(
+            currentKey = currentKey,
+            onDismiss = { showKeyDialog = false },
+            onSave = { key ->
+                ApiKeyStore.set(context, key)
+                showKeyDialog = false
             }
         )
     }
