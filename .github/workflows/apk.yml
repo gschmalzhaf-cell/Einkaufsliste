@@ -20,10 +20,10 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Gradle 8.9 einrichten
+      - name: Gradle 8.13 einrichten
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.13'
 
       - name: Release-APK bauen
         run: gradle :app:assembleRelease --no-daemon
@@ -38,19 +38,15 @@ jobs:
           path: Einkaufsliste-v1.0.apk
           retention-days: 30
 
-      - name: GitHub Release v1.0 erstellen/aktualisieren
+      - name: Changelog des aktuellen Releases extrahieren
+        run: awk '/^## /{n++} n==1' CHANGELOG.md > release-notes.md
+
+      - name: GitHub Release v1.0 mit Changelog erstellen
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create v1.0 Einkaufsliste-v1.0.apk \
             --title "Einkaufsliste v1.0" \
             --target main \
-            --notes "Erste Version der Einkaufsliste-App.
-
-          Funktionen:
-          - Einträge manuell, per Foto (ML Kit Texterkennung, on-device) und aus Rezepttext hinzufügen
-          - Material 3 Expressive Design mit dynamischen Farben
-          - Lokale Room-Datenbank, kein Account, kein Netzwerkzugriff
-
-          Installation: Einkaufsliste-v1.0.apk herunterladen, aufs Handy übertragen und installieren („Unbekannte Quellen“ erlauben)." \
+            --notes-file release-notes.md \
             2>/dev/null || gh release upload v1.0 Einkaufsliste-v1.0.apk --clobber
