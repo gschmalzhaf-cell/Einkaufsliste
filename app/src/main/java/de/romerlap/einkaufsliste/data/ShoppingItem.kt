@@ -8,6 +8,7 @@ data class ShoppingItem(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val detail: String? = null,
+    val retailHint: String? = null,
     val isChecked: Boolean = false,
     val createdAt: Long = System.currentTimeMillis()
 )
