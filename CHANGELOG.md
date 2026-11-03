@@ -3,6 +3,17 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.2 – 2026-11-03
+
+Rezepte können nun auch per Link hinzugefügt werden.
+
+### Neu
+- **Rezept per Link**: Rezept-URL (z. B. von einer Rezeptseite oder einem Food-Blog) einfach ins Rezept-Feld einfügen – die App lädt die Seite und die KI extrahiert die Zutaten mit Mengen direkt daraus
+- Ohne API-Schlüssel wird der Seitentext mit dem lokalen Zutaten-Parser ausgewertet
+
+### Hinweis
+Manche Websites blockieren das automatische Laden ihrer Seiten – in dem Fall erscheint eine klare Fehlermeldung, und der Text kann stattdessen manuell kopiert und eingefügt werden.
+
 ## v1.1 – 2026-11-03
 
 Fotos und Rezepte werden nun von einer KI (Mistral API) ausgewertet.
