@@ -20,12 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.DraftItem
+import de.romerlap.einkaufsliste.MistralApi
 import de.romerlap.einkaufsliste.ui.components.SelectableRow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,35 +38,40 @@ fun PhotoResultSheet(
     onDismiss: () -> Unit,
     onAdd: (List<DraftItem>) -> Unit
 ) {
-    var recognizedLines by remember { mutableStateOf<List<String>?>(null) }
+    var drafts by remember { mutableStateOf<List<DraftItem>?>(null) }
     var failed by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     val recognizer = remember { TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS) }
 
     LaunchedEffect(bitmap) {
-        recognizer.process(InputImage.fromBitmap(bitmap, 0))
-            .addOnSuccessListener { visionText ->
-                recognizedLines = visionText.textBlocks
-                    .flatMap { it.lines }
-                    .map { it.text.trim() }
-                    .filter { it.isNotEmpty() }
-                    .distinct()
+        val apiKey = ApiKeyStore.get(context)
+        if (apiKey != null) {
+            try {
+                drafts = MistralApi.extractFromImage(bitmap, apiKey)
+                    .map { DraftItem(name = it.name, detail = it.quantity) }
+            } catch (e: Exception) {
+                failed = true
             }
-            .addOnFailureListener { failed = true }
+        } else {
+            recognizer.process(InputImage.fromBitmap(bitmap, 0))
+                .addOnSuccessListener { visionText ->
+                    drafts = visionText.textBlocks
+                        .flatMap { it.lines }
+                        .map { it.text.trim() }
+                        .filter { it.isNotEmpty() }
+                        .distinct()
+                        .map { DraftItem(name = it) }
+                }
+                .addOnFailureListener { failed = true }
+        }
     }
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         when {
             failed -> {
-                Text(
-                    "Text konnte nicht erkannt werden.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp)
-                )
+                SheetMessage("Auswertung fehlgeschlagen. Bitte erneut versuchen oder Schlüssel prüfen.")
             }
-            recognizedLines == null -> {
+            drafts == null -> {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -73,20 +81,13 @@ fun PhotoResultSheet(
                     CircularProgressIndicator()
                 }
             }
-            recognizedLines!!.isEmpty() -> {
-                Text(
-                    "Kein Text auf dem Foto erkannt.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp)
-                )
+            drafts!!.isEmpty() -> {
+                SheetMessage("Kein Text auf dem Foto erkannt.")
             }
             else -> {
-                val lines = recognizedLines!!
-                var selected by remember(lines) {
-                    mutableStateOf(lines.associateWith { true })
+                val list = drafts!!
+                var selected by remember(list) {
+                    mutableStateOf(list.associateWith { true })
                 }
                 Text(
                     "Erkannte Einträge",
@@ -94,20 +95,20 @@ fun PhotoResultSheet(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(lines, key = { it }) { line ->
+                    items(list, key = { it.name + (it.detail ?: "") }) { draft ->
                         SelectableRow(
-                            title = line,
-                            supportingText = null,
-                            checked = selected[line] == true,
+                            title = draft.name,
+                            supportingText = draft.detail,
+                            checked = selected[draft] == true,
                             onCheckedChange = { checked ->
-                                selected = selected.toMutableMap().apply { put(line, checked) }
+                                selected = selected.toMutableMap().apply { put(draft, checked) }
                             }
                         )
                     }
                     item {
-                        val chosen = lines.filter { selected[it] == true }
+                        val chosen = list.filter { selected[it] == true }
                         Button(
-                            onClick = { onAdd(chosen.map { DraftItem(name = it) }) },
+                            onClick = { onAdd(chosen) },
                             enabled = chosen.isNotEmpty(),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -120,4 +121,16 @@ fun PhotoResultSheet(
             }
         }
     }
+}
+
+@Composable
+private fun SheetMessage(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.bodyLarge,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp)
+    )
 }
