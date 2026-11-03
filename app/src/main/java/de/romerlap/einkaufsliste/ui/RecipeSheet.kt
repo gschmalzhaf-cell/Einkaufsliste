@@ -27,12 +27,19 @@ import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.DraftItem
 import de.romerlap.einkaufsliste.MistralApi
 import de.romerlap.einkaufsliste.RecipeParser
+import de.romerlap.einkaufsliste.RetailCatalog
 import de.romerlap.einkaufsliste.WebRecipeFetcher
 import de.romerlap.einkaufsliste.ui.components.SelectableRow
 import kotlinx.coroutines.launch
 
 private fun isLink(input: String): Boolean =
     input.startsWith("http://") || input.startsWith("https://")
+
+private fun draftSupporting(draft: DraftItem): String? =
+    listOfNotNull(
+        draft.detail,
+        draft.retailHint?.let { "Handelsüblich: $it" }
+    ).joinToString(" · ").ifEmpty { null }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,10 +82,16 @@ fun RecipeSheet(
                             val apiKey = ApiKeyStore.get(context)
                             parsed = if (apiKey != null) {
                                 MistralApi.extractFromRecipeText(baseText, apiKey)
-                                    .map { DraftItem(name = it.name, detail = it.quantity) }
+                                    .map { DraftItem(name = it.name, detail = it.quantity, retailHint = it.retailHint) }
                             } else {
                                 RecipeParser.extractIngredients(baseText)
-                                    .map { DraftItem(name = it.name, detail = it.quantity) }
+                                    .map {
+                                        DraftItem(
+                                            name = it.name,
+                                            detail = it.quantity,
+                                            retailHint = RetailCatalog.findHint(it.name)
+                                        )
+                                    }
                             }
                         } catch (e: Exception) {
                             error = if (isLink(input)) {
@@ -127,7 +140,7 @@ fun RecipeSheet(
                 items(list, key = { it.name + (it.detail ?: "") }) { draft ->
                     SelectableRow(
                         title = draft.name,
-                        supportingText = draft.detail,
+                        supportingText = draftSupporting(draft),
                         checked = selected[draft] == true,
                         onCheckedChange = { checked ->
                             selected = selected.toMutableMap().apply { put(draft, checked) }
