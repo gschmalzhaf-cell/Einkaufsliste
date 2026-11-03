@@ -187,8 +187,8 @@ fun ListScreen(viewModel: ListViewModel) {
                 headlineContent = { Text("Aus Rezept") },
                 supportingContent = {
                     Text(
-                        if (currentKey != null) "Rezepttext einfügen, KI erkennt Zutaten"
-                        else "Rezepttext einfügen, Zutaten erkennen"
+                        if (currentKey != null) "Text oder Link einfügen – KI erkennt Zutaten"
+                        else "Text oder Link einfügen, Zutaten erkennen"
                     )
                 }
             )
