@@ -3,6 +3,18 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.4 – 2026-11-03
+
+Behoben: Mengenangaben fehlten bei Rezepten, die per Link hinzugefügt wurden.
+
+### Behoben
+- **Mengen bei Rezept-Links**: Rezeptseiten werden jetzt zuerst nach strukturierten Daten (Schema.org JSON-LD) durchsucht, die praktisch alle Rezeptseiten für Suchmaschinen einbetten – dort stehen die Zutaten mit exakten Mengen (z. B. „200 g Mehl“). Erst wenn keine vorhanden sind, wird der normale Seitentext ausgewertet
+- Zusätzlich wird das Microdata-Format (`itemprop="recipeIngredient"`) als weitere Quelle geprüft
+- Längere Rezeptseiten werden vollständig berücksichtigt (bis 60.000 Zeichen statt 25.000)
+
+### Verbessert
+- Der Build veröffentlicht die Release-Version jetzt automatisch aus der App-Version – APK-Name, Tag und Titel stimmen immer überein
+
 ## v1.3 – 2026-11-03
 
 Die App wird nun mit einem eigenen Release-Keystore signiert.
