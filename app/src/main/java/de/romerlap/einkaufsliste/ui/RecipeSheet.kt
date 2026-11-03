@@ -1,6 +1,5 @@
 package de.romerlap.einkaufsliste.ui
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -29,8 +27,12 @@ import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.DraftItem
 import de.romerlap.einkaufsliste.MistralApi
 import de.romerlap.einkaufsliste.RecipeParser
+import de.romerlap.einkaufsliste.WebRecipeFetcher
 import de.romerlap.einkaufsliste.ui.components.SelectableRow
 import kotlinx.coroutines.launch
+
+private fun isLink(input: String): Boolean =
+    input.startsWith("http://") || input.startsWith("https://")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,10 +40,10 @@ fun RecipeSheet(
     onDismiss: () -> Unit,
     onAdd: (List<DraftItem>) -> Unit
 ) {
-    var recipeText by rememberSaveable { mutableStateOf("") }
+    var recipeInput by rememberSaveable { mutableStateOf("") }
     var parsed by remember { mutableStateOf<List<DraftItem>?>(null) }
     var loading by remember { mutableStateOf(false) }
-    var failed by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val hasKey = remember { ApiKeyStore.get(context) != null }
@@ -49,10 +51,10 @@ fun RecipeSheet(
     ModalBottomSheet(onDismissRequest = onDismiss) {
         if (parsed == null) {
             OutlinedTextField(
-                value = recipeText,
-                onValueChange = { recipeText = it },
-                label = { Text("Rezepttext") },
-                placeholder = { Text("z. B. 200 g Mehl\n2 Eier\n100 ml Milch …") },
+                value = recipeInput,
+                onValueChange = { recipeInput = it },
+                label = { Text("Rezepttext oder Link") },
+                placeholder = { Text("https://rezept-seite.de/… oder\n200 g Mehl\n2 Eier") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -60,26 +62,36 @@ fun RecipeSheet(
             )
             OutlinedButton(
                 onClick = {
-                    val apiKey = ApiKeyStore.get(context)
-                    if (apiKey != null) {
-                        loading = true
-                        failed = false
-                        scope.launch {
-                            try {
-                                parsed = MistralApi.extractFromRecipeText(recipeText, apiKey)
-                                    .map { DraftItem(name = it.name, detail = it.quantity) }
-                            } catch (e: Exception) {
-                                failed = true
-                            } finally {
-                                loading = false
+                    val input = recipeInput.trim()
+                    loading = true
+                    error = null
+                    scope.launch {
+                        try {
+                            val baseText = if (isLink(input)) {
+                                WebRecipeFetcher.fetch(input)
+                            } else {
+                                input
                             }
+                            val apiKey = ApiKeyStore.get(context)
+                            parsed = if (apiKey != null) {
+                                MistralApi.extractFromRecipeText(baseText, apiKey)
+                                    .map { DraftItem(name = it.name, detail = it.quantity) }
+                            } else {
+                                RecipeParser.extractIngredients(baseText)
+                                    .map { DraftItem(name = it.name, detail = it.quantity) }
+                            }
+                        } catch (e: Exception) {
+                            error = if (isLink(input)) {
+                                "Seite konnte nicht geladen werden. Bitte Link prüfen (manche Websites blockieren das automatische Laden)."
+                            } else {
+                                "KI-Auswertung fehlgeschlagen. Bitte erneut versuchen oder Schlüssel prüfen."
+                            }
+                        } finally {
+                            loading = false
                         }
-                    } else {
-                        parsed = RecipeParser.extractIngredients(recipeText)
-                            .map { DraftItem(name = it.name, detail = it.quantity) }
                     }
                 },
-                enabled = !loading && recipeText.isNotBlank(),
+                enabled = !loading && recipeInput.isNotBlank(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
@@ -93,9 +105,9 @@ fun RecipeSheet(
                     Text(if (hasKey) "Zutaten per KI erkennen" else "Zutaten erkennen")
                 }
             }
-            if (failed) {
+            if (error != null) {
                 Text(
-                    "KI-Auswertung fehlgeschlagen. Bitte erneut versuchen oder Schlüssel prüfen.",
+                    error!!,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(horizontal = 16.dp)
