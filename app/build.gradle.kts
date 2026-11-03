@@ -13,8 +13,8 @@ android {
         applicationId = "de.romerlap.einkaufsliste"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
 
     buildTypes {
@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.mlkit.text.recognition)
+    implementation(libs.okhttp)
+    implementation(libs.androidx.security.crypto)
     debugImplementation(libs.androidx.compose.ui.tooling)
     testImplementation(libs.junit)
 }
