@@ -17,15 +17,21 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
     val items: StateFlow<List<ShoppingItem>> = dao.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun add(name: String, detail: String? = null) {
+    fun add(name: String, detail: String? = null, retailHint: String? = null) {
         val trimmed = name.trim()
         if (trimmed.isEmpty()) return
-        insert(ShoppingItem(name = trimmed, detail = detail?.trim()?.ifEmpty { null }))
+        insert(
+            ShoppingItem(
+                name = trimmed,
+                detail = detail?.trim()?.ifEmpty { null },
+                retailHint = retailHint?.trim()?.ifEmpty { null }
+            )
+        )
     }
 
     fun addAll(drafts: List<DraftItem>) {
         val cleaned = drafts.map { it.copy(name = it.name.trim()) }.filter { it.name.isNotEmpty() }
-        cleaned.forEach { insert(ShoppingItem(name = it.name, detail = it.detail)) }
+        cleaned.forEach { insert(ShoppingItem(name = it.name, detail = it.detail, retailHint = it.retailHint)) }
     }
 
     fun toggle(item: ShoppingItem) {
