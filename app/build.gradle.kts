@@ -13,15 +13,34 @@ android {
         applicationId = "de.romerlap.einkaufsliste"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
+    }
+
+    signingConfigs {
+        create("release") {
+            val ksFile = System.getenv("ANDROID_KEYSTORE_FILE")
+            val ksPassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            val ksAlias = System.getenv("ANDROID_KEY_ALIAS")
+            val ksKeyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            if (ksFile != null && ksPassword != null && ksAlias != null && File(ksFile).exists()) {
+                storeFile = File(ksFile)
+                storePassword = ksPassword
+                keyAlias = ksAlias
+                keyPassword = ksKeyPassword ?: ksPassword
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (signingConfigs.getByName("release").storeFile?.exists() == true) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
     compileOptions {
