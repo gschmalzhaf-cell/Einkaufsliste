@@ -3,6 +3,19 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.1 – 2026-11-03
+
+Fotos und Rezepte werden nun von einer KI (Mistral API) ausgewertet.
+
+### Neu
+- **Foto per KI**: Liste oder Notiz abfotografieren – die KI erkennt jeden Artikel mit der richtigen Menge (z. B. „Mehl – 200 g“) und trägt ihn direkt auf die Einkaufsliste
+- **Rezept per KI**: Rezepttext einfügen – die KI extrahiert Zutaten und Mengen zuverlässiger als der bisherige Text-Parser
+- **Einstellungen**: Über das Zahnrad-Symbol einen Mistral-API-Schlüssel hinterlegen (erhältlich auf console.mistral.ai). Der Schlüssel wird verschlüsselt ausschließlich auf dem Gerät gespeichert
+- Ohne API-Schlüssel funktioniert die App wie bisher komplett offline (ML Kit Texterkennung bzw. lokaler Zutaten-Parser)
+
+### Hinweis
+Für die KI-Auswertung wird eine Internetverbindung benötigt; der Text geht zur Analyse an die Mistral-API. Alle Einkaufslisten-Daten bleiben lokal auf dem Gerät.
+
 ## v1.0 – 2026-11-03
 
 Erste Version der Einkaufsliste-App.
