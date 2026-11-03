@@ -3,6 +3,17 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.3 – 2026-11-03
+
+Die App wird nun mit einem eigenen Release-Keystore signiert.
+
+### Geändert
+- **Echte Release-Signatur**: Die APK wird in GitHub Actions mit dem hinterlegten Keystore signiert (statt der Debug-Signatur) – Voraussetzung für saubere Updates und späteren Play-Store-Upload
+- Die Signaturprüfung von Android wird damit geändert: **Einmaliges Neuinstallieren erforderlich** – die bestehende App deinstallieren und die neue APK installieren
+
+### Hinweis
+Fehlt der Keystore im Build (z. B. lokaler Build ohne Secrets), wird automatisch die Debug-Signierung verwendet.
+
 ## v1.2 – 2026-11-03
 
 Rezepte können nun auch per Link hinzugefügt werden.
