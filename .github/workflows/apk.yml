@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   release-apk:
     runs-on: ubuntu-latest
@@ -34,3 +37,20 @@ jobs:
           name: Einkaufsliste-APK
           path: Einkaufsliste-v1.0.apk
           retention-days: 30
+
+      - name: GitHub Release v1.0 erstellen/aktualisieren
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.0 Einkaufsliste-v1.0.apk \
+            --title "Einkaufsliste v1.0" \
+            --target main \
+            --notes "Erste Version der Einkaufsliste-App.
+
+          Funktionen:
+          - Einträge manuell, per Foto (ML Kit Texterkennung, on-device) und aus Rezepttext hinzufügen
+          - Material 3 Expressive Design mit dynamischen Farben
+          - Lokale Room-Datenbank, kein Account, kein Netzwerkzugriff
+
+          Installation: Einkaufsliste-v1.0.apk herunterladen, aufs Handy übertragen und installieren („Unbekannte Quellen“ erlauben)." \
+            2>/dev/null || gh release upload v1.0 Einkaufsliste-v1.0.apk --clobber
