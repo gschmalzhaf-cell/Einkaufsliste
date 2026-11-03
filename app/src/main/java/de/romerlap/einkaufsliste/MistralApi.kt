@@ -15,8 +15,10 @@ import java.util.Base64
 import java.util.concurrent.TimeUnit
 
 /**
- * Anbindung an die Mistral-API: extrahiert aus Fotos (Vision-Modell Pixtral)
- * und Rezepttexten Artikel mit Menge als strukturiertes JSON.
+ * Anbindung an die Mistral-API: extrahiert aus Fotos und Rezepttexten
+ * Artikel mit Menge als strukturiertes JSON.
+ * Modell: mistral-small-latest (Mistral Small, aktuell, mit Vision-Fähigkeit
+ * laut offizieller Mistral-Doku „Vision“).
  */
 object MistralApi {
 
@@ -28,8 +30,7 @@ object MistralApi {
     class MistralException(message: String) : IOException(message)
 
     private const val ENDPOINT = "https://api.mistral.ai/v1/chat/completions"
-    private const val VISION_MODEL = "pixtral-12-latest"
-    private const val TEXT_MODEL = "mistral-small-latest"
+    private const val MODEL = "mistral-small-latest"
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(20, TimeUnit.SECONDS)
@@ -56,20 +57,20 @@ object MistralApi {
                     .put("image_url", JSONObject().put("url", "data:image/jpeg;base64,$base64"))
             )
         }
-        return request(VISION_MODEL, content, apiKey)
+        return request(content, apiKey)
     }
 
     suspend fun extractFromRecipeText(text: String, apiKey: String): List<ExtractedItem> {
         val content = JSONArray().apply {
             put(JSONObject().put("type", "text").put("text", prompt + "\n\nRezept:\n" + text))
         }
-        return request(TEXT_MODEL, content, apiKey)
+        return request(content, apiKey)
     }
 
-    private suspend fun request(model: String, content: JSONArray, apiKey: String): List<ExtractedItem> =
+    private suspend fun request(content: JSONArray, apiKey: String): List<ExtractedItem> =
         withContext(Dispatchers.IO) {
             val body = JSONObject().apply {
-                put("model", model)
+                put("model", MODEL)
                 put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", content)))
                 put("temperature", 0)
                 put("response_format", JSONObject().put("type", "json_object"))
