@@ -76,6 +76,16 @@ jobs:
             exit 1
           fi
 
+      - name: Version ermitteln
+        run: |
+          APP_VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
+          if [ -z "$APP_VERSION" ]; then
+            echo "::error::versionName konnte nicht aus app/build.gradle.kts ermittelt werden."
+            exit 1
+          fi
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+          echo "Version: $APP_VERSION"
+
       - name: Release-APK bauen
         run: |
           set -o pipefail
@@ -90,24 +100,24 @@ jobs:
           exit 1
 
       - name: APK umbenennen
-        run: cp app/build/outputs/apk/release/app-release.apk Einkaufsliste-v1.3.apk
+        run: cp app/build/outputs/apk/release/app-release.apk "Einkaufsliste-v${APP_VERSION}.apk"
 
       - name: APK als Artefakt hochladen
         uses: actions/upload-artifact@v4
         with:
           name: Einkaufsliste-APK
-          path: Einkaufsliste-v1.3.apk
+          path: "Einkaufsliste-v${APP_VERSION}.apk"
           retention-days: 30
 
       - name: Changelog des aktuellen Releases extrahieren
         run: awk '/^## /{n++} n==1' CHANGELOG.md > release-notes.md
 
-      - name: GitHub Release v1.3 mit Changelog erstellen
+      - name: GitHub Release mit Changelog erstellen
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v1.3 Einkaufsliste-v1.3.apk \
-            --title "Einkaufsliste v1.3" \
+          gh release create "v${APP_VERSION}" "Einkaufsliste-v${APP_VERSION}.apk" \
+            --title "Einkaufsliste v${APP_VERSION}" \
             --target main \
             --notes-file release-notes.md \
-            2>/dev/null || gh release upload v1.3 Einkaufsliste-v1.3.apk --clobber
+            2>/dev/null || gh release upload "v${APP_VERSION}" "Einkaufsliste-v${APP_VERSION}.apk" --clobber
