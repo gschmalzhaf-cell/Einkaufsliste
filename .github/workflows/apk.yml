@@ -112,7 +112,7 @@ jobs:
       - name: Changelog des aktuellen Releases extrahieren
         run: awk '/^## /{n++} n==1' CHANGELOG.md > release-notes.md
 
-      - name: GitHub Release mit Changelog erstellen
+      - name: GitHub Release mit Changelog erstellen oder korrigieren
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -120,4 +120,8 @@ jobs:
             --title "Einkaufsliste v${APP_VERSION}" \
             --target main \
             --notes-file release-notes.md \
-            2>/dev/null || gh release upload "v${APP_VERSION}" "Einkaufsliste-v${APP_VERSION}.apk" --clobber
+            2>/dev/null || true
+          gh release edit "v${APP_VERSION}" \
+            --title "Einkaufsliste v${APP_VERSION}" \
+            --notes-file release-notes.md
+          gh release upload "v${APP_VERSION}" "Einkaufsliste-v${APP_VERSION}.apk" --clobber
