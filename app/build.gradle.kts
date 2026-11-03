@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "de.romerlap.einkaufsliste"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "de.romerlap.einkaufsliste"
