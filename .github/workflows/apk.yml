@@ -26,7 +26,17 @@ jobs:
           gradle-version: '8.13'
 
       - name: Release-APK bauen
-        run: gradle :app:assembleRelease --no-daemon
+        run: |
+          set -o pipefail
+          gradle :app:assembleRelease --no-daemon 2>&1 | tee build.log
+
+      - name: FehlerSummary als Annotation
+        if: failure()
+        run: |
+          grep -E "error: |e: |FAILURE|What went wrong|Could not|Caused by|required" build.log | head -12 | while IFS= read -r line; do
+            echo "::error::$(echo "$line" | cut -c1-250)"
+          done
+          exit 1
 
       - name: APK umbenennen
         run: cp app/build/outputs/apk/release/app-release.apk Einkaufsliste-v1.0.apk
