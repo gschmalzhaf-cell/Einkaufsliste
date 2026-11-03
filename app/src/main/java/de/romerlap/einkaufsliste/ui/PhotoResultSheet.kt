@@ -29,6 +29,7 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.DraftItem
 import de.romerlap.einkaufsliste.MistralApi
+import de.romerlap.einkaufsliste.RetailCatalog
 import de.romerlap.einkaufsliste.ui.components.SelectableRow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +49,7 @@ fun PhotoResultSheet(
         if (apiKey != null) {
             try {
                 drafts = MistralApi.extractFromImage(bitmap, apiKey)
-                    .map { DraftItem(name = it.name, detail = it.quantity) }
+                    .map { DraftItem(name = it.name, detail = it.quantity, retailHint = it.retailHint) }
             } catch (e: Exception) {
                 failed = true
             }
@@ -60,7 +61,7 @@ fun PhotoResultSheet(
                         .map { it.text.trim() }
                         .filter { it.isNotEmpty() }
                         .distinct()
-                        .map { DraftItem(name = it) }
+                        .map { DraftItem(name = it, retailHint = RetailCatalog.findHint(it)) }
                 }
                 .addOnFailureListener { failed = true }
         }
@@ -98,7 +99,10 @@ fun PhotoResultSheet(
                     items(list, key = { it.name + (it.detail ?: "") }) { draft ->
                         SelectableRow(
                             title = draft.name,
-                            supportingText = draft.detail,
+                            supportingText = listOfNotNull(
+                                draft.detail,
+                                draft.retailHint?.let { "Handelsüblich: $it" }
+                            ).joinToString(" · ").ifEmpty { null },
                             checked = selected[draft] == true,
                             onCheckedChange = { checked ->
                                 selected = selected.toMutableMap().apply { put(draft, checked) }
