@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.5 – 2026-11-03
+
+Behoben: Mengenangaben fehlten bei bestimmten Rezept-Links (u. a. Chefkoch und einfachbacken.de).
+
+### Behoben
+- **Chefkoch-Rezepte**: Chefkoch lädt die Zutatennamen erst per JavaScript nach – statisch geladene Seiten enthalten sie nicht. Die App liest Chefkoch-Rezepte jetzt direkt über die öffentliche Chefkoch-API aus, die alle Zutaten mit exakten Mengen liefert (z. B. „200 g Zucker“, „0,5 Pck. Backpulver")
+- **Seiten mit getrennten Mengen-Spalten** (z. B. einfachbacken.de): Wenn Menge und Artikel im Seitenlayout als eigene Elemente vorliegen, werden sie jetzt automatisch zu einer Zeile zusammengeführt („250 g“ + „weiche Butter“ → „250 g weiche Butter“)
+
 ## v1.4 – 2026-11-03
 
 Behoben: Mengenangaben fehlten bei Rezepten, die per Link hinzugefügt wurden.
