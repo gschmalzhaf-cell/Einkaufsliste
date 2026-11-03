@@ -198,8 +198,8 @@ fun ListScreen(viewModel: ListViewModel) {
     if (showManualDialog) {
         ManualAddDialog(
             onDismiss = { showManualDialog = false },
-            onConfirm = { name, detail ->
-                viewModel.add(name, detail)
+            onConfirm = { name, detail, retailHint ->
+                viewModel.add(name, detail, retailHint)
                 showManualDialog = false
             }
         )
@@ -276,6 +276,13 @@ private fun ItemRow(
                 Text(
                     item.detail,
                     style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            if (item.retailHint != null) {
+                Text(
+                    "Handelsüblich: ${item.retailHint}",
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
