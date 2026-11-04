@@ -30,6 +30,7 @@ import de.romerlap.einkaufsliste.RecipeParser
 import de.romerlap.einkaufsliste.RetailCatalog
 import de.romerlap.einkaufsliste.WebRecipeFetcher
 import de.romerlap.einkaufsliste.ui.components.SelectableRow
+import de.romerlap.einkaufsliste.ui.components.TagField
 import kotlinx.coroutines.launch
 
 private fun isLink(input: String): Boolean =
@@ -45,9 +46,11 @@ private fun draftSupporting(draft: DraftItem): String? =
 @Composable
 fun RecipeSheet(
     onDismiss: () -> Unit,
-    onAdd: (List<DraftItem>) -> Unit
+    onAdd: (List<DraftItem>) -> Unit,
+    existingTags: List<String> = emptyList()
 ) {
     var recipeInput by rememberSaveable { mutableStateOf("") }
+    var tag by rememberSaveable { mutableStateOf("") }
     var parsed by remember { mutableStateOf<List<DraftItem>?>(null) }
     var loading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -66,6 +69,12 @@ fun RecipeSheet(
                     .fillMaxWidth()
                     .height(200.dp)
                     .padding(horizontal = 16.dp)
+            )
+            TagField(
+                tag = tag,
+                onTagChange = { tag = it },
+                existingTags = existingTags,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
             OutlinedButton(
                 onClick = {
@@ -136,6 +145,12 @@ fun RecipeSheet(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
+            TagField(
+                tag = tag,
+                onTagChange = { tag = it },
+                existingTags = existingTags,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 items(list, key = { it.name + (it.detail ?: "") }) { draft ->
                     SelectableRow(
@@ -150,7 +165,10 @@ fun RecipeSheet(
                 item {
                     val chosen = list.filter { selected[it] == true }
                     Button(
-                        onClick = { onAdd(chosen) },
+                        onClick = {
+                            val tagValue = tag.trim().ifBlank { null }
+                            onAdd(chosen.map { it.copy(tag = it.tag ?: tagValue) })
+                        },
                         enabled = chosen.isNotEmpty(),
                         modifier = Modifier
                             .fillMaxWidth()

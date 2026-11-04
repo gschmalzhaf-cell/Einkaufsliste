@@ -5,6 +5,7 @@ Eine einfache, private Android-Einkaufsliste für ein Gerät. Einträge können 
 - **Manuell** – Artikel und optionale Menge/Hinweis eintippen
 - **Per Foto** – Liste oder Notiz abfotografieren; mit Mistral-API-Schlüssel erkennt die KI Artikel mit Menge, sonst on-device per ML Kit
 - **Aus Rezept** – Rezepttext oder Rezept-Link einfügen; die App liest bevorzugt die strukturierten Rezeptdaten der Seite (Schema.org/JSON-LD) mit exakten Mengenangaben
+- **Tags (optional)** – Einträge lassen sich mit einem Tag versehen (z. B. „Grillabend“); über die Tag-Chips lassen sie sich priorisieren sowie ein- und ausblenden
 
 ## Technik
 

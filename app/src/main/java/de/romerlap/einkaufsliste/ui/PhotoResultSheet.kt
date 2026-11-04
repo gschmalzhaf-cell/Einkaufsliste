@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,16 +32,19 @@ import de.romerlap.einkaufsliste.DraftItem
 import de.romerlap.einkaufsliste.MistralApi
 import de.romerlap.einkaufsliste.RetailCatalog
 import de.romerlap.einkaufsliste.ui.components.SelectableRow
+import de.romerlap.einkaufsliste.ui.components.TagField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoResultSheet(
     bitmap: Bitmap,
     onDismiss: () -> Unit,
-    onAdd: (List<DraftItem>) -> Unit
+    onAdd: (List<DraftItem>) -> Unit,
+    existingTags: List<String> = emptyList()
 ) {
     var drafts by remember { mutableStateOf<List<DraftItem>?>(null) }
     var failed by remember { mutableStateOf(false) }
+    var tag by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
     val recognizer = remember { TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS) }
 
@@ -95,6 +99,12 @@ fun PhotoResultSheet(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
+                TagField(
+                    tag = tag,
+                    onTagChange = { tag = it },
+                    existingTags = existingTags,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
                     items(list, key = { it.name + (it.detail ?: "") }) { draft ->
                         SelectableRow(
@@ -112,7 +122,10 @@ fun PhotoResultSheet(
                     item {
                         val chosen = list.filter { selected[it] == true }
                         Button(
-                            onClick = { onAdd(chosen) },
+                            onClick = {
+                                val tagValue = tag.trim().ifBlank { null }
+                                onAdd(chosen.map { it.copy(tag = it.tag ?: tagValue) })
+                            },
                             enabled = chosen.isNotEmpty(),
                             modifier = Modifier
                                 .fillMaxWidth()

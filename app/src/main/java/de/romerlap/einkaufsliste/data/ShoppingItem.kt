@@ -9,6 +9,7 @@ data class ShoppingItem(
     val name: String,
     val detail: String? = null,
     val retailHint: String? = null,
+    val tag: String? = null,
     val isChecked: Boolean = false,
     val createdAt: Long = System.currentTimeMillis()
 )

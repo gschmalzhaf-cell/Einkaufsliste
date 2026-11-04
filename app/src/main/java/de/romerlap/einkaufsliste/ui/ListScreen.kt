@@ -16,17 +16,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.FilterAltOff
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -56,10 +60,13 @@ import de.romerlap.einkaufsliste.data.ShoppingItem
 @Composable
 fun ListScreen(viewModel: ListViewModel) {
     val items by viewModel.items.collectAsState()
+    val allTags = items.mapNotNull { it.tag }.distinct().sorted()
     var showAddSheet by rememberSaveable { mutableStateOf(false) }
     var showManualDialog by rememberSaveable { mutableStateOf(false) }
     var showRecipeSheet by rememberSaveable { mutableStateOf(false) }
     var showKeyDialog by rememberSaveable { mutableStateOf(false) }
+    var selectedTags by rememberSaveable { mutableStateOf(listOf<String>()) }
+    var onlySelectedTags by rememberSaveable { mutableStateOf(false) }
     var photoResult by remember { mutableStateOf<Bitmap?>(null) }
 
     val context = LocalContext.current
@@ -91,6 +98,14 @@ fun ListScreen(viewModel: ListViewModel) {
             TopAppBar(
                 title = { Text("Einkaufsliste") },
                 actions = {
+                    if (selectedTags.isNotEmpty()) {
+                        IconButton(onClick = { onlySelectedTags = !onlySelectedTags }) {
+                            Icon(
+                                if (onlySelectedTags) Icons.Filled.FilterAltOff else Icons.Filled.FilterAlt,
+                                contentDescription = if (onlySelectedTags) "Alle Einträge anzeigen" else "Nur gewählte Tags anzeigen"
+                            )
+                        }
+                    }
                     if (items.any { it.isChecked }) {
                         IconButton(onClick = { viewModel.deleteChecked() }) {
                             Icon(Icons.Filled.DoneAll, contentDescription = "Erledigte entfernen")
@@ -110,7 +125,11 @@ fun ListScreen(viewModel: ListViewModel) {
             )
         }
     ) { innerPadding ->
-        if (items.isEmpty()) {
+        val selected = selectedTags.toSet()
+        val visible = if (selected.isEmpty() || !onlySelectedTags) items else items.filter { it.tag in selected }
+        val prioritized = if (selected.isEmpty()) visible else visible.sortedBy { it.tag !in selected }
+
+        if (visible.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -118,7 +137,8 @@ fun ListScreen(viewModel: ListViewModel) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    "Noch nichts auf der Liste.\nTippe auf „Hinzufügen“.",
+                    if (items.isEmpty()) "Noch nichts auf der Liste.\nTippe auf „Hinzufügen“."
+                    else "Keine Einträge mit den gewählten Tags.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -130,8 +150,24 @@ fun ListScreen(viewModel: ListViewModel) {
                     .padding(innerPadding),
                 contentPadding = PaddingValues(8.dp)
             ) {
-                val open = items.filter { !it.isChecked }
-                val done = items.filter { it.isChecked }
+                if (allTags.isNotEmpty()) {
+                    item {
+                        TagFilterRow(
+                            allTags = allTags,
+                            selectedTags = selectedTags,
+                            onToggle = { tag ->
+                                selectedTags = if (tag in selectedTags) selectedTags - tag else selectedTags + tag
+                                if (selectedTags.isEmpty()) onlySelectedTags = false
+                            },
+                            onClear = {
+                                selectedTags = emptyList()
+                                onlySelectedTags = false
+                            }
+                        )
+                    }
+                }
+                val open = prioritized.filter { !it.isChecked }
+                val done = prioritized.filter { it.isChecked }
                 if (open.isNotEmpty()) {
                     item { SectionHeader("Offen") }
                     items(open, key = { it.id }) { item ->
@@ -198,10 +234,11 @@ fun ListScreen(viewModel: ListViewModel) {
     if (showManualDialog) {
         ManualAddDialog(
             onDismiss = { showManualDialog = false },
-            onConfirm = { name, detail, retailHint ->
-                viewModel.add(name, detail, retailHint)
+            onConfirm = { name, detail, retailHint, tag ->
+                viewModel.add(name, detail, retailHint, tag)
                 showManualDialog = false
-            }
+            },
+            existingTags = allTags
         )
     }
 
@@ -211,7 +248,8 @@ fun ListScreen(viewModel: ListViewModel) {
             onAdd = { drafts ->
                 viewModel.addAll(drafts)
                 showRecipeSheet = false
-            }
+            },
+            existingTags = allTags
         )
     }
 
@@ -233,8 +271,38 @@ fun ListScreen(viewModel: ListViewModel) {
             onAdd = { drafts ->
                 viewModel.addAll(drafts)
                 photoResult = null
-            }
+            },
+            existingTags = allTags
         )
+    }
+}
+
+@Composable
+private fun TagFilterRow(
+    allTags: List<String>,
+    selectedTags: List<String>,
+    onToggle: (String) -> Unit,
+    onClear: () -> Unit
+) {
+    LazyRow(
+        modifier = Modifier.padding(bottom = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp)
+    ) {
+        item {
+            FilterChip(
+                selected = selectedTags.isEmpty(),
+                onClick = onClear,
+                label = { Text("Alle") }
+            )
+        }
+        items(allTags) { tag ->
+            FilterChip(
+                selected = tag in selectedTags,
+                onClick = { onToggle(tag) },
+                label = { Text(tag) }
+            )
+        }
     }
 }
 
@@ -267,11 +335,21 @@ private fun ItemRow(
                 .padding(horizontal = 4.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                item.name,
-                style = MaterialTheme.typography.bodyLarge,
-                textDecoration = if (item.isChecked) TextDecoration.LineThrough else null
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    item.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textDecoration = if (item.isChecked) TextDecoration.LineThrough else null
+                )
+                if (item.tag != null) {
+                    Text(
+                        "#${item.tag}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
             if (item.detail != null) {
                 Text(
                     item.detail,

@@ -3,6 +3,19 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.7 – 2026-11-04
+
+Neu: Einträge können optional mit einem Tag versehen werden, um Artikel für einen bestimmten Zweck (z. B. „Grillabend“ oder „Kuchenbacken“) einzukaufen.
+
+### Neu
+- **Optionaler Tag pro Eintrag**: Beim manuellen Anlegen, bei Foto-Einträgen und bei Rezept-Zutaten lässt sich ein Tag angeben – ganz frei oder per Vorschlags-Chip aus bereits vorhandenen Tags. Das Feld bleibt komplett optional
+- **Priorisieren**: Wird ein Tag in der Chip-Leiste oben ausgewählt, rücken seine Einträge in der Liste nach oben (innerhalb „Offen“ und „Erledigt“ bleibt die gewohnte Reihenfolge)
+- **Ein-/Ausblenden**: Über das Filter-Symbol in der Kopfzeile blendet man alle Einträge ohne den gewählten Tag aus – und wieder ein
+- **Tag-Anzeige**: Getaggte Einträge zeigen ihren Tag als farbiges „#Tag“ neben dem Artikelnamen
+
+### Technisch
+- Datenbank erweitert (Version 3, automatische Migration) – bestehende Einträge bleiben erhalten, Tags sind optional
+
 ## v1.6 – 2026-11-03
 
 Neu: Zu jedem Eintrag wird jetzt eine handelsübliche Packungsgröße (Rewe, Aldi) angezeigt, mit der der Rezept-Bedarf abgedeckt ist.

@@ -23,15 +23,18 @@ import androidx.compose.ui.unit.dp
 import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.MistralApi
 import de.romerlap.einkaufsliste.RetailCatalog
+import de.romerlap.einkaufsliste.ui.components.TagField
 import kotlinx.coroutines.launch
 
 @Composable
 fun ManualAddDialog(
     onDismiss: () -> Unit,
-    onConfirm: (name: String, detail: String?, retailHint: String?) -> Unit
+    onConfirm: (name: String, detail: String?, retailHint: String?, tag: String?) -> Unit,
+    existingTags: List<String> = emptyList()
 ) {
     var name by rememberSaveable { mutableStateOf("") }
     var detail by rememberSaveable { mutableStateOf("") }
+    var tag by rememberSaveable { mutableStateOf("") }
     var aiHint by rememberSaveable { mutableStateOf("") }
     var researching by rememberSaveable { mutableStateOf(false) }
     var researchFailed by rememberSaveable { mutableStateOf(false) }
@@ -61,6 +64,12 @@ fun ManualAddDialog(
                     label = { Text("Menge / Hinweis (optional)") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
+                )
+                TagField(
+                    tag = tag,
+                    onTagChange = { tag = it },
+                    existingTags = existingTags,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
                 if (shownHint != null) {
                     Text(
@@ -113,7 +122,7 @@ fun ManualAddDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = { onConfirm(name, detail.ifBlank { null }, shownHint) },
+                onClick = { onConfirm(name, detail.ifBlank { null }, shownHint, tag.ifBlank { null }) },
                 enabled = name.isNotBlank()
             ) { Text("Hinzufügen") }
         },
