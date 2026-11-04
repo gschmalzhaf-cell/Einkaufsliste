@@ -66,6 +66,7 @@ fun ListScreen(viewModel: ListViewModel) {
     var showRecipeSheet by rememberSaveable { mutableStateOf(false) }
     var showKeyDialog by rememberSaveable { mutableStateOf(false) }
     var selectedTags by rememberSaveable { mutableStateOf(listOf<String>()) }
+    var untaggedSelected by rememberSaveable { mutableStateOf(false) }
     var onlySelectedTags by rememberSaveable { mutableStateOf(false) }
     var photoResult by remember { mutableStateOf<Bitmap?>(null) }
 
@@ -98,7 +99,7 @@ fun ListScreen(viewModel: ListViewModel) {
             TopAppBar(
                 title = { Text("Einkaufsliste") },
                 actions = {
-                    if (selectedTags.isNotEmpty()) {
+                    if (selectedTags.isNotEmpty() || untaggedSelected) {
                         IconButton(onClick = { onlySelectedTags = !onlySelectedTags }) {
                             Icon(
                                 if (onlySelectedTags) Icons.Filled.FilterAltOff else Icons.Filled.FilterAlt,
@@ -125,9 +126,19 @@ fun ListScreen(viewModel: ListViewModel) {
             )
         }
     ) { innerPadding ->
-        val selected = selectedTags.toSet()
-        val visible = if (selected.isEmpty() || !onlySelectedTags) items else items.filter { it.tag in selected }
-        val prioritized = if (selected.isEmpty()) visible else visible.sortedBy { it.tag !in selected }
+        val selected = selectedTags.filter { it in allTags }.toSet()
+        val visible = if (!onlySelectedTags) {
+            items
+        } else {
+            items.filter { (it.tag == null && untaggedSelected) || (it.tag != null && it.tag in selected) }
+        }
+        val prioritized = visible.sortedBy { item ->
+            when {
+                item.tag == null -> 0
+                item.tag in selected -> 1
+                else -> 2
+            }
+        }
 
         if (visible.isEmpty()) {
             Box(
@@ -138,7 +149,7 @@ fun ListScreen(viewModel: ListViewModel) {
             ) {
                 Text(
                     if (items.isEmpty()) "Noch nichts auf der Liste.\nTippe auf „Hinzufügen“."
-                    else "Keine Einträge mit den gewählten Tags.",
+                    else "Keine Einträge für die gewählte Auswahl.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -155,12 +166,18 @@ fun ListScreen(viewModel: ListViewModel) {
                         TagFilterRow(
                             allTags = allTags,
                             selectedTags = selectedTags,
+                            untaggedSelected = untaggedSelected,
                             onToggle = { tag ->
                                 selectedTags = if (tag in selectedTags) selectedTags - tag else selectedTags + tag
-                                if (selectedTags.isEmpty()) onlySelectedTags = false
+                                if (selectedTags.isEmpty() && !untaggedSelected) onlySelectedTags = false
+                            },
+                            onToggleUntagged = {
+                                untaggedSelected = !untaggedSelected
+                                if (!untaggedSelected && selectedTags.isEmpty()) onlySelectedTags = false
                             },
                             onClear = {
                                 selectedTags = emptyList()
+                                untaggedSelected = false
                                 onlySelectedTags = false
                             }
                         )
@@ -281,7 +298,9 @@ fun ListScreen(viewModel: ListViewModel) {
 private fun TagFilterRow(
     allTags: List<String>,
     selectedTags: List<String>,
+    untaggedSelected: Boolean,
     onToggle: (String) -> Unit,
+    onToggleUntagged: () -> Unit,
     onClear: () -> Unit
 ) {
     LazyRow(
@@ -291,9 +310,16 @@ private fun TagFilterRow(
     ) {
         item {
             FilterChip(
-                selected = selectedTags.isEmpty(),
+                selected = selectedTags.isEmpty() && !untaggedSelected,
                 onClick = onClear,
                 label = { Text("Alle") }
+            )
+        }
+        item {
+            FilterChip(
+                selected = untaggedSelected,
+                onClick = onToggleUntagged,
+                label = { Text("Ohne Tag") }
             )
         }
         items(allTags) { tag ->
@@ -339,7 +365,8 @@ private fun ItemRow(
                 Text(
                     item.name,
                     style = MaterialTheme.typography.bodyLarge,
-                    textDecoration = if (item.isChecked) TextDecoration.LineThrough else null
+                    textDecoration = if (item.isChecked) TextDecoration.LineThrough else null,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
                 if (item.tag != null) {
                     Text(

@@ -3,6 +3,16 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.8 – 2026-11-04
+
+Verbessert: Feinschliff der Tag-Priorisierung und Anzeige.
+
+### Geändert
+- **Artikel ohne Tag haben immer höchste Priorität**: Sie stehen immer ganz oben der Liste – unabhängig davon, welche Tags ausgewählt sind. Danach folgen Artikel mit ausgewähltem Tag, dann der Rest
+- **Chip „Ohne Tag“**: Getaggte Artikel lassen sich gezielt ausblenden, sodass nur noch ungetaggte Artikel sichtbar sind (in Kombination mit dem Filter-Symbol)
+- **Lange Artikelnamen**: Der Artikelname bricht jetzt um, der Tag bleibt immer vollständig sichtbar
+- **Verwaiste Tags**: Ein Tag ohne Artikel verschwindet sofort aus der Chip-Leiste
+
 ## v1.7 – 2026-11-04
 
 Neu: Einträge können optional mit einem Tag versehen werden, um Artikel für einen bestimmten Zweck (z. B. „Grillabend“ oder „Kuchenbacken“) einzukaufen.
