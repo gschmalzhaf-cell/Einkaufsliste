@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.9 – 2026-11-04
+
+Verbessert: Direktes Filtern über die Tag-Chips.
+
+### Geändert
+- **Filter-Chips wirken sofort**: Wird ein Tag (oder „Ohne Tag“) in der Chip-Leiste ausgewählt, zeigt die Liste sofort nur noch die passenden Einträge – der zusätzliche Klick auf das Filter-Symbol entfällt
+- Mehrere Tags lassen sich weiterhin kombinieren, „Alle“ zeigt wieder die komplette Liste
+- Artikel ohne Tag stehen auch bei aktivem Filter ganz oben
+
 ## v1.8 – 2026-11-04
 
 Verbessert: Feinschliff der Tag-Priorisierung und Anzeige.

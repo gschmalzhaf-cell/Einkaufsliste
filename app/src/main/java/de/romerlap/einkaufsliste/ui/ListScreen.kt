@@ -22,8 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.FilterAltOff
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Settings
@@ -67,7 +65,6 @@ fun ListScreen(viewModel: ListViewModel) {
     var showKeyDialog by rememberSaveable { mutableStateOf(false) }
     var selectedTags by rememberSaveable { mutableStateOf(listOf<String>()) }
     var untaggedSelected by rememberSaveable { mutableStateOf(false) }
-    var onlySelectedTags by rememberSaveable { mutableStateOf(false) }
     var photoResult by remember { mutableStateOf<Bitmap?>(null) }
 
     val context = LocalContext.current
@@ -99,14 +96,6 @@ fun ListScreen(viewModel: ListViewModel) {
             TopAppBar(
                 title = { Text("Einkaufsliste") },
                 actions = {
-                    if (selectedTags.isNotEmpty() || untaggedSelected) {
-                        IconButton(onClick = { onlySelectedTags = !onlySelectedTags }) {
-                            Icon(
-                                if (onlySelectedTags) Icons.Filled.FilterAltOff else Icons.Filled.FilterAlt,
-                                contentDescription = if (onlySelectedTags) "Alle Einträge anzeigen" else "Nur gewählte Tags anzeigen"
-                            )
-                        }
-                    }
                     if (items.any { it.isChecked }) {
                         IconButton(onClick = { viewModel.deleteChecked() }) {
                             Icon(Icons.Filled.DoneAll, contentDescription = "Erledigte entfernen")
@@ -127,7 +116,8 @@ fun ListScreen(viewModel: ListViewModel) {
         }
     ) { innerPadding ->
         val selected = selectedTags.filter { it in allTags }.toSet()
-        val visible = if (!onlySelectedTags) {
+        val hasSelection = selected.isNotEmpty() || untaggedSelected
+        val visible = if (!hasSelection) {
             items
         } else {
             items.filter { (it.tag == null && untaggedSelected) || (it.tag != null && it.tag in selected) }
@@ -169,16 +159,11 @@ fun ListScreen(viewModel: ListViewModel) {
                             untaggedSelected = untaggedSelected,
                             onToggle = { tag ->
                                 selectedTags = if (tag in selectedTags) selectedTags - tag else selectedTags + tag
-                                if (selectedTags.isEmpty() && !untaggedSelected) onlySelectedTags = false
                             },
-                            onToggleUntagged = {
-                                untaggedSelected = !untaggedSelected
-                                if (!untaggedSelected && selectedTags.isEmpty()) onlySelectedTags = false
-                            },
+                            onToggleUntagged = { untaggedSelected = !untaggedSelected },
                             onClear = {
                                 selectedTags = emptyList()
                                 untaggedSelected = false
-                                onlySelectedTags = false
                             }
                         )
                     }
