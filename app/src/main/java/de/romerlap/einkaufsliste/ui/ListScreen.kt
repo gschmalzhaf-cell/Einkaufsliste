@@ -110,7 +110,7 @@ fun ListScreen(viewModel: ListViewModel) {
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
-                modifier = Modifier.border(2.dp, Ink),
+                modifier = Modifier.border(2.dp, MaterialTheme.colorScheme.outline),
                 actions = {
                     if (items.any { it.isChecked }) {
                         IconButton(onClick = { viewModel.deleteChecked() }) {

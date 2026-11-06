@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.11 – 2026-11-06
+
+Behoben: Comic-Karten im Dunkelmodus waren hell, während die Schrift die helle Dunkelmodus-Farbe nutzte – hell auf hell war schlecht lesbar.
+
+### Behoben
+- **Lesbarkeit im Dunkelmodus**: Die Sticker-Karten sind im Dunkelmodus jetzt dunkel (warmes Braun) mit cremefarbener Schrift; im Hellmodus bleiben sie cremefarben mit schwarzer Schrift
+- **Konturen theme-abhängig**: Karten-Ränder, Chips und die Kopfzeilen-Linie nutzen im Dunkelmodus die cremefarbene Kontur statt Schwarz, damit sie sichtbar bleiben
+
 ## v1.10 – 2026-11-06
 
 Neu: Komplettes Redesign im Retro-Comic-Stil.
