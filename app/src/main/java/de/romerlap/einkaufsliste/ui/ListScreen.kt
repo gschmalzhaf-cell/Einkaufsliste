@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,6 +55,10 @@ import androidx.core.content.ContextCompat
 import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.ListViewModel
 import de.romerlap.einkaufsliste.data.ShoppingItem
+import de.romerlap.einkaufsliste.ui.theme.ComicCard
+import de.romerlap.einkaufsliste.ui.theme.Ink
+import de.romerlap.einkaufsliste.ui.theme.comicOutline
+import de.romerlap.einkaufsliste.ui.theme.comicSticker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,7 +100,17 @@ fun ListScreen(viewModel: ListViewModel) {
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Einkaufsliste") },
+                title = {
+                    Text(
+                        "Einkaufsliste",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                ),
+                modifier = Modifier.border(2.dp, Ink),
                 actions = {
                     if (items.any { it.isChecked }) {
                         IconButton(onClick = { viewModel.deleteChecked() }) {
@@ -110,6 +126,9 @@ fun ListScreen(viewModel: ListViewModel) {
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { showAddSheet = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.comicOutline(16.dp),
                 icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
                 text = { Text("Hinzufügen") }
             )
@@ -297,21 +316,24 @@ private fun TagFilterRow(
             FilterChip(
                 selected = selectedTags.isEmpty() && !untaggedSelected,
                 onClick = onClear,
-                label = { Text("Alle") }
+                label = { Text("Alle") },
+                modifier = Modifier.comicOutline(16.dp)
             )
         }
         item {
             FilterChip(
                 selected = untaggedSelected,
                 onClick = onToggleUntagged,
-                label = { Text("Ohne Tag") }
+                label = { Text("Ohne Tag") },
+                modifier = Modifier.comicOutline(16.dp)
             )
         }
         items(allTags) { tag ->
             FilterChip(
                 selected = tag in selectedTags,
                 onClick = { onToggle(tag) },
-                label = { Text(tag) }
+                label = { Text(tag) },
+                modifier = Modifier.comicOutline(16.dp)
             )
         }
     }
@@ -321,9 +343,12 @@ private fun TagFilterRow(
 private fun SectionHeader(title: String) {
     Text(
         title,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        style = MaterialTheme.typography.headlineSmall,
+        color = Ink,
+        modifier = Modifier
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .comicSticker()
+            .padding(horizontal = 10.dp, vertical = 2.dp)
     )
 }
 
@@ -333,14 +358,19 @@ private fun ItemRow(
     onToggle: () -> Unit,
     onDelete: () -> Unit
 ) {
-    Row(
+    ComicCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
-        Checkbox(checked = item.isChecked, onCheckedChange = { onToggle() })
-        Column(
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(checked = item.isChecked, onCheckedChange = { onToggle() })
+            Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 4.dp, vertical = 8.dp),
@@ -356,8 +386,8 @@ private fun ItemRow(
                 if (item.tag != null) {
                     Text(
                         "#${item.tag}",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
@@ -377,8 +407,9 @@ private fun ItemRow(
                 )
             }
         }
-        IconButton(onClick = onDelete) {
-            Icon(Icons.Filled.Delete, contentDescription = "Löschen")
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Filled.Delete, contentDescription = "Löschen")
+            }
         }
     }
 }

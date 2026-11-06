@@ -3,6 +3,19 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.10 – 2026-11-06
+
+Neu: Komplettes Redesign im Retro-Comic-Stil.
+
+### Neu
+- **Retro-Comic-Design**: Creme-Papierton, Comic-Rot, Sonnengelb und Comic-Blau ersetzen das bisherige Material-Grün; die dynamischen Android-Farben sind bewusst deaktiviert, damit der Comic-Look überall gleich aussieht
+- **Comic-Schriften**: Überschriften, Buttons und Titel in „Bangers“, Texte in der runden „Baloo 2“ (beide unterstützen Umlaute)
+- **Sticker-Karten**: Jeder Listeneintrag liegt auf einer Karte mit dicker schwarzer Kontur und hartem, versetztem Schatten
+- **Comic-Chips**: Die Tag-Filter-Chips haben eine schwarze Umrandung im Sticker-Stil
+- **Gelbe Sticker-Überschriften**: „Offen“ und „Erledigt“ stehen als gelber Sticker mit schwarzer Kontur über der Liste
+- **Roter Comic-Button**: Der „Hinzufügen“-Knopf ist jetzt knallrot mit schwarzer Kontur
+- Dunkelmodus mit warmer Comic-Palette (Braun-Papier mit roten/gelben Akzenten)
+
 ## v1.9 – 2026-11-04
 
 Verbessert: Direktes Filtern über die Tag-Chips.

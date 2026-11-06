@@ -9,7 +9,7 @@ Eine einfache, private Android-Einkaufsliste für ein Gerät. Einträge können 
 
 ## Technik
 
-- Kotlin, Jetpack Compose, **Material 3 Expressive** (`MaterialExpressiveTheme`, dynamische Farben ab Android 12)
+- Kotlin, Jetpack Compose, **Material 3 Expressive** im **Retro-Comic-Look** (eigene Farbpalette, Comic-Fonts „Bangers“ + „Baloo 2“)
 - Room-Datenbank (lokal, kein Account)
 - ML Kit Text Recognition (on-device) + Mistral API (optional, für Foto- und Rezept-Auswertung)
 - Mindestens Android 8.0 (API 26), targetSdk 35
