@@ -17,9 +17,6 @@ import androidx.compose.ui.unit.dp
 /** Comic-Tuschefarbe für Konturen. */
 val Ink = Color(0xFF1D1D1B)
 
-/** Comic-Papierton für Karten. */
-val ComicPaper = Color(0xFFFFFDF5)
-
 /**
  * Karte im Retro-Comic-Stil: Fläche mit dicker Kontur und hartem,
  * versetztem Schatten („Sticker-Look"). Kontur, Kartenfarbe und

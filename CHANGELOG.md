@@ -3,6 +3,20 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.12 – 2026-11-06
+
+Hygiene- und Update-Tag: Werkzeugkette und Abhängigkeiten auf den aktuellsten Stand gebracht, Code aufgeräumt.
+
+### Aktualisiert
+- **Android Gradle Plugin** 8.10.1 → 9.5.1, **Kotlin** 2.1.20 → 2.4.21, **KSP** → 2.3.13, **Gradle** 8.13 → 9.9.0 (Wrapper + CI)
+- **Compose BOM** 2025.09.00 → 2026.09.00 (Compose 1.12, Material 3 1.4.0 stabil – die separate Alpha-Abhängigkeit entfällt)
+- **Room** 2.7.1 → 2.8.5, **OkHttp** 4.12.0 → 5.5.1, **core-ktx** 1.15.0 → 1.19.1, **Lifecycle** 2.8.7 → 2.11.0, **Activity-Compose** 1.9.3 → 1.13.0, **security-crypto** jetzt stabil (1.1.0 statt Alpha)
+- compileSdk 37, targetSdk 36; Kotlin-Compiler-Optionen auf moderne DSL (`kotlin { compilerOptions }`) umgestellt
+
+### Aufgeräumt
+- Ungenutzte Konstante `ComicPaper` entfernt (Karten nutzen jetzt die Theme-Farbe)
+- Material3 wird einheitlich über die Compose BOM verwaltet
+
 ## v1.11 – 2026-11-06
 
 Behoben: Comic-Karten im Dunkelmodus waren hell, während die Schrift die helle Dunkelmodus-Farbe nutzte – hell auf hell war schlecht lesbar.

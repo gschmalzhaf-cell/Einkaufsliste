@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,14 +9,14 @@ plugins {
 
 android {
     namespace = "de.romerlap.einkaufsliste"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "de.romerlap.einkaufsliste"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 12
-        versionName = "1.11"
+        targetSdk = 36
+        versionCode = 13
+        versionName = "1.12"
     }
 
     signingConfigs {
@@ -47,11 +49,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         compose = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
