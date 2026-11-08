@@ -9,9 +9,10 @@ Hygiene- und Update-Tag: Werkzeugkette und Abhängigkeiten auf den aktuellsten S
 
 ### Aktualisiert
 - **Android Gradle Plugin** 8.10.1 → 9.5.1, **Kotlin** 2.1.20 → 2.4.21, **KSP** → 2.3.13, **Gradle** 8.13 → 9.9.0 (Wrapper + CI)
-- **Compose BOM** 2025.09.00 → 2026.09.00 (Compose 1.12, Material 3 1.4.0 stabil – die separate Alpha-Abhängigkeit entfällt)
+- **Compose BOM** 2025.09.00 → 2026.09.00 (Compose 1.12); Material 3 Expressive bleibt auf der Alpha-Line, aktualisiert auf 1.5.0-alpha29 (MaterialExpressiveTheme ist in der stabilen 1.4.0 noch intern)
 - **Room** 2.7.1 → 2.8.5, **OkHttp** 4.12.0 → 5.5.1, **core-ktx** 1.15.0 → 1.19.1, **Lifecycle** 2.8.7 → 2.11.0, **Activity-Compose** 1.9.3 → 1.13.0, **security-crypto** jetzt stabil (1.1.0 statt Alpha)
 - compileSdk 37, targetSdk 36; Kotlin-Compiler-Optionen auf moderne DSL (`kotlin { compilerOptions }`) umgestellt
+- **AGP 9 Built-in Kotlin**: Das Plugin `org.jetbrains.kotlin.android` wird nicht mehr benötigt und wurde aus allen Build-Dateien entfernt
 
 ### Aufgeräumt
 - Ungenutzte Konstante `ComicPaper` entfernt (Karten nutzen jetzt die Theme-Farbe)
