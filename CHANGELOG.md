@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.13 – 2026-11-10
+
+Neu: Das App-Icon passt jetzt zum Retro-Comic-Look der App.
+
+### Neu
+- **Comic-App-Icon**: Sticker-Einkaufsliste auf Creme-Papier – Karte mit dicker Tusche-Kontur und hartem Schatten, rotem Titel-Balken, gelbem abgehaktem Punkt und offener Zeile (ersetzt den weißen Einkaufswagen auf Dunkelgrün)
+- **Getheimte Icons** (Android 13+): eigene Monochrome-Variante, die dem System-Farbschema folgt
+- Design-Quelle: `design/screens/app-icon.svg`
+
 ## v1.12 – 2026-11-06
 
 Hygiene- und Update-Tag: Werkzeugkette und Abhängigkeiten auf den aktuellsten Stand gebracht, Code aufgeräumt.

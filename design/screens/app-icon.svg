@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="216" height="216" viewBox="0 0 108 108">
+  <!-- App-Icon 'Retro Comic Einkaufsliste' – adaptive Icon, 108dp-Viewport -->
+  <!-- Hintergrund-Layer: Creme-Papier -->
+  <rect width="108" height="108" fill="#FFF6E5"/>
+  <!-- Vordergrund-Layer, innerhalb der Safe-Zone (21-87) -->
+  <!-- Harter Schatten (Sticker-Look) -->
+  <rect x="27" y="30" width="56" height="60" rx="9" fill="#1D1D1B"/>
+  <!-- Liste-Karte mit Tusche-Kontur -->
+  <rect x="22" y="25" width="56" height="60" rx="9" fill="#FFFDF5" stroke="#1D1D1B" stroke-width="3"/>
+  <!-- Roter Titel-Balken -->
+  <rect x="30" y="33" width="40" height="8" rx="4" fill="#D62828"/>
+  <!-- Zeile 1: abgehakt (gelber Sticker-Punkt mit Haken) -->
+  <circle cx="38" cy="52" r="6" fill="#FFC800" stroke="#1D1D1B" stroke-width="2.5"/>
+  <path d="M35,52.5 l2.4,2.6 l4.4,-5" fill="none" stroke="#1D1D1B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="48" y="49.5" width="22" height="5" rx="2.5" fill="#1D1D1B"/>
+  <!-- Zeile 2: offen -->
+  <circle cx="38" cy="68" r="6" fill="#FFF6E5" stroke="#1D1D1B" stroke-width="2.5"/>
+  <rect x="48" y="65.5" width="22" height="5" rx="2.5" fill="#4A443A"/>
+  <!-- Zeile 3: Rest -->
+  <rect x="30" y="78" width="38" height="5" rx="2.5" fill="#4A443A"/>
+</svg>
