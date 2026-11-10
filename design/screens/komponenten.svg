@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <!-- Retro Comic Design System – Farbpalette, Typografie und Komponenten -->
+  <rect width="1200" height="700" fill="#FFF6E5"/>
+  <text x="24" y="48" font-family="Bangers, 'Baloo 2', sans-serif" font-size="34" fill="#D62828">RETRO COMIC DESIGN SYSTEM</text>
+
+  <!-- Farbpalette -->
+  <text x="24" y="92" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="16" fill="#1D1D1B">Farben</text>
+  <g font-family="'Baloo 2', sans-serif" font-size="12" fill="#1D1D1B">
+    <rect x="24" y="104" width="120" height="48" rx="8" fill="#D62828" stroke="#1D1D1B" stroke-width="2"/>
+    <text x="154" y="124">Comic-Rot</text><text x="154" y="140">#D62828</text>
+    <rect x="24" y="164" width="120" height="48" rx="8" fill="#FFC800" stroke="#1D1D1B" stroke-width="2"/>
+    <text x="154" y="184">Sonnengelb</text><text x="154" y="200">#FFC800</text>
+    <rect x="24" y="224" width="120" height="48" rx="8" fill="#1D6FD1" stroke="#1D1D1B" stroke-width="2"/>
+    <text x="154" y="244">Comic-Blau</text><text x="154" y="260">#1D6FD1</text>
+    <rect x="24" y="284" width="120" height="48" rx="8" fill="#FFB703" stroke="#1D1D1B" stroke-width="2"/>
+    <text x="154" y="304">Akzent-Gelb</text><text x="154" y="320">#FFB703</text>
+    <rect x="24" y="344" width="120" height="48" rx="8" fill="#FFF6E5" stroke="#1D1D1B" stroke-width="2"/>
+    <text x="154" y="364">Creme-Papier</text><text x="154" y="380">#FFF6E5</text>
+    <rect x="24" y="404" width="120" height="48" rx="8" fill="#FFFDF5" stroke="#1D1D1B" stroke-width="2"/>
+    <text x="154" y="424">Karte</text><text x="154" y="440">#FFFDF5</text>
+    <rect x="24" y="464" width="120" height="48" rx="8" fill="#1D1D1B" stroke="#1D1D1B" stroke-width="2"/>
+    <text x="154" y="484">Ink/Tusche</text><text x="154" y="500">#1D1D1B</text>
+    <rect x="24" y="524" width="120" height="48" rx="8" fill="#26221C" stroke="#1D1D1B" stroke-width="2"/>
+    <text x="154" y="544">Dark BG</text><text x="154" y="560">#26221C</text>
+    <rect x="24" y="584" width="120" height="48" rx="8" fill="#302B24" stroke="#1D1D1B" stroke-width="2"/>
+    <text x="154" y="604">Dark Karte</text><text x="154" y="620">#302B24</text>
+  </g>
+
+  <!-- Typografie -->
+  <text x="420" y="92" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="16" fill="#1D1D1B">Typografie</text>
+  <text x="420" y="130" font-family="Bangers, 'Baloo 2', sans-serif" font-size="30" fill="#1D1D1B">Bangers – Display</text>
+  <text x="420" y="160" font-family="Bangers, 'Baloo 2', sans-serif" font-size="20" fill="#1D1D1B">Bangers – Title 18px</text>
+  <text x="420" y="192" font-family="'Baloo 2', sans-serif" font-size="16" fill="#1D1D1B">Baloo 2 – Body 16px (Artikelname)</text>
+  <text x="420" y="216" font-family="'Baloo 2', sans-serif" font-size="12" fill="#4A443A">Baloo 2 – Body Small 12px (Menge/Hinweis)</text>
+  <text x="420" y="242" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="13" fill="#1D1D1B">Baloo 2 Bold – Label 12-14px (Chips, Buttons)</text>
+  <text x="420" y="270" font-family="Bangers, 'Baloo 2', sans-serif" font-size="16" fill="#1D6FD1">#Grillabend (Tag, Comic-Blau)</text>
+
+  <!-- Komponenten -->
+  <text x="420" y="330" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="16" fill="#1D1D1B">Komponenten</text>
+
+  <!-- Sticker-Karte -->
+  <rect x="424" y="352" width="344" height="72" rx="14" fill="#1D1D1B"/>
+  <rect x="420" y="348" width="344" height="72" rx="14" fill="#FFFDF5" stroke="#1D1D1B" stroke-width="2"/>
+  <rect x="432" y="372" width="22" height="22" rx="4" fill="#FFF6E5" stroke="#1D1D1B" stroke-width="2"/>
+  <text x="468" y="384" font-family="'Baloo 2', sans-serif" font-size="16" fill="#1D1D1B">Artikelname</text>
+  <text x="590" y="384" font-family="Bangers, 'Baloo 2', sans-serif" font-size="16" fill="#1D6FD1">#Grillabend</text>
+  <text x="468" y="404" font-family="'Baloo 2', sans-serif" font-size="12" fill="#4A443A">2 Stück · ComicCard</text>
+  <circle cx="742" cy="384" r="12" fill="none" stroke="#1D1D1B" stroke-width="2"/>
+  <line x1="735" y1="384" x2="749" y2="384" stroke="#1D1D1B" stroke-width="2"/>
+
+  <!-- Chips -->
+  <rect x="420" y="444" width="96" height="32" rx="16" fill="#FFF6E5" stroke="#1D1D1B" stroke-width="2"/>
+  <text x="446" y="465" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="13" fill="#1D1D1B">Alle</text>
+  <rect x="524" y="444" width="104" height="32" rx="16" fill="#FFF6E5" stroke="#1D1D1B" stroke-width="2"/>
+  <text x="540" y="465" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="13" fill="#1D1D1B">Ohne Tag</text>
+  <rect x="636" y="444" width="112" height="32" rx="16" fill="#FFC800" stroke="#1D1D1B" stroke-width="2"/>
+  <text x="654" y="465" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="13" fill="#1D1D1B">Grillabend</text>
+
+  <!-- Section-Sticker -->
+  <rect x="420" y="496" width="100" height="36" rx="6" fill="#FFC800" stroke="#1D1D1B" stroke-width="2"/>
+  <text x="438" y="522" font-family="Bangers, 'Baloo 2', sans-serif" font-size="22" fill="#1D1D1B">OFFEN</text>
+
+  <!-- FAB -->
+  <rect x="784" y="500" width="160" height="48" rx="16" fill="#1D1D1B"/>
+  <rect x="780" y="496" width="160" height="48" rx="16" fill="#D62828" stroke="#1D1D1B" stroke-width="2"/>
+  <text x="804" y="526" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="15" fill="#FFFFFF">+ Hinzufügen</text>
+
+  <!-- App-Bar -->
+  <rect x="420" y="568" width="344" height="56" fill="#FFF6E5" stroke="#1D1D1B" stroke-width="2"/>
+  <text x="436" y="604" font-family="Bangers, 'Baloo 2', sans-serif" font-size="26" fill="#D62828">EINKAUFSLISTE</text>
+  <text x="420" y="644" font-family="'Baloo 2', sans-serif" font-size="12" fill="#4A443A">App-Bar: Creme-Hintergrund, 2px untere Kontur, Titel in Comic-Rot</text>
+</svg>
