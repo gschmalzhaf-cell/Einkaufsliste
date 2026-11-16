@@ -53,6 +53,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import de.romerlap.einkaufsliste.ApiKeyStore
+import de.romerlap.einkaufsliste.ReportLog
 import de.romerlap.einkaufsliste.ListViewModel
 import de.romerlap.einkaufsliste.data.ShoppingItem
 import de.romerlap.einkaufsliste.ui.theme.ComicCard
@@ -69,6 +70,8 @@ fun ListScreen(viewModel: ListViewModel) {
     var showManualDialog by rememberSaveable { mutableStateOf(false) }
     var showRecipeSheet by rememberSaveable { mutableStateOf(false) }
     var showKeyDialog by rememberSaveable { mutableStateOf(false) }
+    var showSettings by rememberSaveable { mutableStateOf(false) }
+    var showReport by rememberSaveable { mutableStateOf(false) }
     var selectedTags by rememberSaveable { mutableStateOf(listOf<String>()) }
     var untaggedSelected by rememberSaveable { mutableStateOf(false) }
     var photoResult by remember { mutableStateOf<Bitmap?>(null) }
@@ -117,7 +120,7 @@ fun ListScreen(viewModel: ListViewModel) {
                             Icon(Icons.Filled.DoneAll, contentDescription = "Erledigte entfernen")
                         }
                     }
-                    IconButton(onClick = { showKeyDialog = true }) {
+                    IconButton(onClick = { showSettings = true }) {
                         Icon(Icons.Filled.Settings, contentDescription = "Einstellungen")
                     }
                 }
@@ -272,6 +275,27 @@ fun ListScreen(viewModel: ListViewModel) {
             },
             existingTags = allTags
         )
+    }
+
+    if (showSettings) {
+        SettingsSheet(
+            onDismiss = { showSettings = false },
+            onOpenApiKey = { showKeyDialog = true; showSettings = false },
+            onOpenReport = { showReport = true; showSettings = false }
+        )
+    }
+
+    if (showReport) {
+        val report = remember(items) {
+            ReportLog.generate(
+                context = context,
+                openCount = items.count { !it.isChecked },
+                doneCount = items.count { it.isChecked },
+                tags = allTags,
+                apiKeySet = ApiKeyStore.get(context) != null
+            )
+        }
+        ReportDialog(report = report, onDismiss = { showReport = false })
     }
 
     if (showKeyDialog) {

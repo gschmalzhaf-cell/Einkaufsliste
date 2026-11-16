@@ -15,6 +15,11 @@ object ApiKeyStore {
 
     fun set(context: Context, value: String?) {
         prefs(context).edit().putString(KEY, value?.trim()).apply()
+        if (value.isNullOrBlank()) {
+            ReportLog.info("Einstellungen", "API-Schlüssel entfernt")
+        } else {
+            ReportLog.info("Einstellungen", "API-Schlüssel gespeichert")
+        }
     }
 
     private fun prefs(context: Context): EncryptedSharedPreferences {

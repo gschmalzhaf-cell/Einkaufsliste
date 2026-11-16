@@ -30,6 +30,7 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.DraftItem
 import de.romerlap.einkaufsliste.MistralApi
+import de.romerlap.einkaufsliste.ReportLog
 import de.romerlap.einkaufsliste.RetailCatalog
 import de.romerlap.einkaufsliste.ui.components.SelectableRow
 import de.romerlap.einkaufsliste.ui.components.TagField
@@ -55,6 +56,7 @@ fun PhotoResultSheet(
                 drafts = MistralApi.extractFromImage(bitmap, apiKey)
                     .map { DraftItem(name = it.name, detail = it.quantity, retailHint = it.retailHint) }
             } catch (e: Exception) {
+                ReportLog.error("Foto-KI", "${e.javaClass.simpleName}: ${e.message}")
                 failed = true
             }
         } else {

@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.MistralApi
+import de.romerlap.einkaufsliste.ReportLog
 import de.romerlap.einkaufsliste.RetailCatalog
 import de.romerlap.einkaufsliste.ui.components.TagField
 import kotlinx.coroutines.launch
@@ -93,6 +94,7 @@ fun ManualAddDialog(
                                         apiKey
                                     )
                                 } catch (e: Exception) {
+                                    ReportLog.error("KI-Recherche", "Artikel '${name.trim()}': ${e.javaClass.simpleName}: ${e.message}")
                                     researchFailed = true
                                 } finally {
                                     researching = false

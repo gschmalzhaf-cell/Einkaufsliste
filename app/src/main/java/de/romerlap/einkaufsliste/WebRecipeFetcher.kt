@@ -1,6 +1,7 @@
 package de.romerlap.einkaufsliste
 
 import android.text.Html
+import de.romerlap.einkaufsliste.ReportLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -34,6 +35,7 @@ object WebRecipeFetcher {
             try {
                 return@withContext fetchChefkochRecipe(id)
             } catch (e: Exception) {
+                ReportLog.warn("WebRecipeFetcher", "Chefkoch-API fehlgeschlagen: ${e.javaClass.simpleName}: ${e.message}")
             }
         }
         extractRecipeText(downloadHtml(url)).take(maxChars)
@@ -139,6 +141,7 @@ object WebRecipeFetcher {
             try {
                 collectIngredients(JSONObject(match.groupValues[1].trim()), ingredients)
             } catch (e: Exception) {
+                ReportLog.warn("WebRecipeFetcher", "JSON-LD konnte nicht gelesen werden: ${e.javaClass.simpleName}")
             }
         }
         return ingredients.takeIf { it.isNotEmpty() }?.distinct()

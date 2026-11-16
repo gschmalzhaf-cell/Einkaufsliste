@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.DraftItem
 import de.romerlap.einkaufsliste.MistralApi
+import de.romerlap.einkaufsliste.ReportLog
 import de.romerlap.einkaufsliste.RecipeParser
 import de.romerlap.einkaufsliste.RetailCatalog
 import de.romerlap.einkaufsliste.WebRecipeFetcher
@@ -103,6 +104,7 @@ fun RecipeSheet(
                                     }
                             }
                         } catch (e: Exception) {
+                            ReportLog.error("Rezept-Import", "${e.javaClass.simpleName}: ${e.message}")
                             error = if (isLink(input)) {
                                 "Seite konnte nicht geladen werden. Bitte Link prüfen (manche Websites blockieren das automatische Laden)."
                             } else {

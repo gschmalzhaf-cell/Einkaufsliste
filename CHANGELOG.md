@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.14 – 2026-11-11
+
+Neu: Diagnose-Bericht für Fehlerfindung und Qualitätsverbesserung.
+
+### Neu
+- **Diagnose-Bericht**: Über Einstellungen → „Diagnose-Bericht“ wird ein Markdown-Bericht erzeugt (Gerät & App-Version, Android-Version, Dunkelmodus, Eintrags-/Tag-Statistik, API-Schlüssel-Status, letzter Absturz, Ereignisprotokoll) – per „Kopieren“ oder „Teilen“ weitergebbar
+- **Automatische Protokollierung**: Abstürze werden dauerhaft gespeichert; KI-Foto-Auswertung, KI-Recherche, Rezept-Import, Chefkoch-API, JSON-LD-Extraktion und API-Schlüssel-Änderungen schreiben ins Ereignisprotokoll (max. 200 Einträge)
+- **Einstellungen als Sheet**: Das Zahnrad öffnet jetzt ein Einstellungs-Menü (API-Schlüssel, Diagnose-Bericht)
+
 ## v1.13 – 2026-11-10
 
 Neu: Das App-Icon passt jetzt zum Retro-Comic-Look der App.
