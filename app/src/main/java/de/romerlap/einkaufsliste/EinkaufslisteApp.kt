@@ -7,15 +7,19 @@ class EinkaufslisteApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            try {
-                ReportLog.persistCrash(this, throwable)
-            } catch (_: Throwable) {
-                // Protokollierung darf den Absturz niemals blockieren
+        try {
+            val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+            Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+                try {
+                    ReportLog.persistCrash(this, throwable)
+                } catch (_: Throwable) {
+                    // Protokollierung darf den Absturz niemals blockieren
+                }
+                defaultHandler?.uncaughtException(thread, throwable)
             }
-            defaultHandler?.uncaughtException(thread, throwable)
+            ReportLog.info("App", "Gestartet (Android ${android.os.Build.VERSION.RELEASE})")
+        } catch (e: Exception) {
+            // Der App-Start darf an der Diagnose niemals scheitern
         }
-        ReportLog.info("App", "Gestartet (Android ${android.os.Build.VERSION.RELEASE})")
     }
 }

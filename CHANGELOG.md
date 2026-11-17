@@ -3,6 +3,16 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.15 – 2026-11-17
+
+Behoben: Weißer Bildschirm nach dem App-Start.
+
+### Behoben
+- **Start blockiert nicht mehr auf dem Keystore**: Der verschlüsselt gespeicherte API-Schlüssel wird jetzt asynchron im Hintergrund geladen statt synchron beim Start auf dem Haupt-Thread – hängt das Android-Keystore auf dem Gerät, erscheint die Liste trotzdem sofort
+- **Verschlüsselter Speicher wirft nie mehr**: Lese-/Schreibfehler landen im Diagnose-Bericht statt die App zum Absturz/einzufrieren
+- **Material 3 stabil**: Das Alpha-Pin (1.5.0-alpha29) ist entfernt; die App nutzt das stabile Material 3 aus der Compose BOM (1.4.0) mit `MaterialTheme` – Comic-Look (Farben, Schriften, Sticker-Karten) bleibt vollständig erhalten
+- **App-Start komplett defensiv**: Die Application-Klasse kann an der Diagnose-Initialisierung nicht mehr scheitern
+
 ## v1.14 – 2026-11-11
 
 Neu: Diagnose-Bericht für Fehlerfindung und Qualitätsverbesserung.

@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.ReportLog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import de.romerlap.einkaufsliste.ListViewModel
 import de.romerlap.einkaufsliste.data.ShoppingItem
 import de.romerlap.einkaufsliste.ui.theme.ComicCard
@@ -77,7 +80,10 @@ fun ListScreen(viewModel: ListViewModel) {
     var photoResult by remember { mutableStateOf<Bitmap?>(null) }
 
     val context = LocalContext.current
-    val currentKey = remember { ApiKeyStore.get(context) }
+    var currentKey by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+        currentKey = withContext(Dispatchers.IO) { ApiKeyStore.get(context) }
+    }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicturePreview()
@@ -292,7 +298,7 @@ fun ListScreen(viewModel: ListViewModel) {
                 openCount = items.count { !it.isChecked },
                 doneCount = items.count { it.isChecked },
                 tags = allTags,
-                apiKeySet = ApiKeyStore.get(context) != null
+                apiKeySet = currentKey != null
             )
         }
         ReportDialog(report = report, onDismiss = { showReport = false })

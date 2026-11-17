@@ -10,15 +10,25 @@ object ApiKeyStore {
     private const val PREFS_NAME = "mistral_prefs"
     private const val KEY = "mistral_api_key"
 
-    fun get(context: Context): String? =
+    /** Liest den Schlüssel – wirft nie, sondern protokolliert und liefert null. */
+    fun get(context: Context): String? = try {
         prefs(context).getString(KEY, null)?.takeIf { it.isNotBlank() }
+    } catch (e: Exception) {
+        ReportLog.error("ApiKeyStore", "Lesen fehlgeschlagen: ${e.javaClass.simpleName}: ${e.message}")
+        null
+    }
 
+    /** Speichert den Schlüssel – wirft nie, sondern protokolliert. */
     fun set(context: Context, value: String?) {
-        prefs(context).edit().putString(KEY, value?.trim()).apply()
-        if (value.isNullOrBlank()) {
-            ReportLog.info("Einstellungen", "API-Schlüssel entfernt")
-        } else {
-            ReportLog.info("Einstellungen", "API-Schlüssel gespeichert")
+        try {
+            prefs(context).edit().putString(KEY, value?.trim()).apply()
+            if (value.isNullOrBlank()) {
+                ReportLog.info("Einstellungen", "API-Schlüssel entfernt")
+            } else {
+                ReportLog.info("Einstellungen", "API-Schlüssel gespeichert")
+            }
+        } catch (e: Exception) {
+            ReportLog.error("ApiKeyStore", "Speichern fehlgeschlagen: ${e.javaClass.simpleName}: ${e.message}")
         }
     }
 
