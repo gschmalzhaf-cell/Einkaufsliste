@@ -62,6 +62,20 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /** Nackter Compose-Test: Text ohne eigenes Theme, Fonts oder Scaffold. */
+    private fun startComposeMiniTest() {
+        ReportLog.info("Startup", "Compose Mini-Test gestartet (nackter Text)")
+        setContent {
+            androidx.compose.material3.MaterialTheme {
+                androidx.compose.material3.Text(
+                    "Compose Mini-Test OK – Compose rendert!",
+                    modifier = Modifier.fillMaxSize(),
+                    color = androidx.compose.ui.graphics.Color.Black
+                )
+            }
+        }
+    }
+
     private fun shareReport() {
         val report = try {
             ReportLog.generate(
@@ -132,6 +146,20 @@ class MainActivity : ComponentActivity() {
         openButton.setBackgroundColor(Color.rgb(0xD6, 0x28, 0x28))
         openButton.setOnClickListener { startCompose(useComicFonts = true) }
         container.addView(openButton)
+
+        val miniTestButton = Button(this)
+        miniTestButton.text = "Compose Mini-Test (nackter Text)"
+        miniTestButton.textSize = 14f
+        miniTestButton.setTextColor(Color.rgb(0x1D, 0x1D, 0x1B))
+        miniTestButton.setBackgroundColor(Color.rgb(0xFF, 0xB7, 0x03))
+        miniTestButton.setOnClickListener { startComposeMiniTest() }
+        val miniParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        miniParams.topMargin = 16
+        miniTestButton.layoutParams = miniParams
+        container.addView(miniTestButton)
 
         val openPlainButton = Button(this)
         openPlainButton.text = "Öffnen – mit Standardschrift"

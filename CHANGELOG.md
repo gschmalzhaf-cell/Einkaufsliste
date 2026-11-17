@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.20 – 2026-11-17
+
+Diagnose-Build: Rendert pures Compose auf dem Gerät?
+
+### Neu
+- **Knopf „Compose Mini-Test“**: startet einen nackten Compose-Text ohne eigenes Theme, ohne eingebettete Schriften, ohne Scaffold – rendert er, liegt das Problem im App-UI-Baum; rendert er nicht, ist Compose selbst auf Android 17 blockiert
+- Comic-Schriften sind als Ursache entlastet (beide v1.19-Varianten blieben weiß)
+
 ## v1.19 – 2026-11-17
 
 Diagnose-Build: Comic-Schriften als Ursache des weißen Bildschirms prüfen.
