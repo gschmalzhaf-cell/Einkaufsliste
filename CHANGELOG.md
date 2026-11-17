@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.18 – 2026-11-18
+
+Diagnose-Build: Start ohne Compose, Bericht teilbar ohne funktionierende Oberfläche.
+
+### Neu
+- **Diagnose-Startbildschirm**: Die App öffnet in einen reinen Android-View-Bildschirm OHNE Compose – mit Statuszeile (Datenbankprüfung), Knopf „Einkaufsliste öffnen“ (startet die Compose-UI bewusst) und Knopf „Diagnose-Bericht teilen“ (erzeugt und teilt den Bericht ohne Compose)
+- Damit ist die Ursache eindeutig trennbar: rendert der Startbildschirm nicht → Systemproblem; bleibt nach „Öffnen“ weiß → Compose-Problem auf Android 17; funktioniert alles → Start-Timing-Problem
+
 ## v1.17 – 2026-11-18
 
 Diagnose-Build: weißer Bildschirm auf Android 17 weiter eingrenzen.

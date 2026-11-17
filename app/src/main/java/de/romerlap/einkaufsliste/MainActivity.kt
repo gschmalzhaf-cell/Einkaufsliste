@@ -1,11 +1,15 @@
 package de.romerlap.einkaufsliste
 
+import android.content.Intent
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,6 +22,11 @@ import de.romerlap.einkaufsliste.data.AppDatabase
 import de.romerlap.einkaufsliste.ui.ListScreen
 import de.romerlap.einkaufsliste.ui.theme.EinkaufslisteTheme
 
+/**
+ * Diagnose-Start: Die App öffnet zuerst einen reinen Android-View-Bildschirm
+ * (ohne Compose). Von dort aus kann die Compose-UI bewusst gestartet und der
+ * Diagnose-Bericht jederzeit geteilt werden – auch wenn Compose nicht rendert.
+ */
 class MainActivity : ComponentActivity() {
 
     private lateinit var statusView: TextView
@@ -26,24 +35,24 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Diagnose-Stufenbildschirm: reine Android-Views OHNE Compose.
-        // Bleibt er sichtbar, haengt/failt Compose; verschwindet er, rendert Compose.
+        ReportLog.info("Startup", "MainActivity onCreate (Diagnose-Modus)")
         setContentView(buildStatusScreen())
-        step("App gestartet – Datenbank wird geoeffnet …")
+        step("Datenbank wird geprüft …")
 
-        ReportLog.info("Startup", "MainActivity onCreate")
-
-        // Datenbank-Initialisierung anstossen und im Hintergrund pruefen
         Thread {
             try {
                 AppDatabase.get(application).itemDao().observeAll()
-                runOnUiThread { step("Datenbank OK – Compose wird gestartet …") }
+                runOnUiThread { step("Datenbank OK. Tippe unten auf „Einkaufsliste öffnen“.") }
             } catch (e: Exception) {
                 ReportLog.error("Startup", "Datenbank: ${e.javaClass.simpleName}: ${e.message}")
-                runOnUiThread { step("Datenbank-FEHLER: ${e.javaClass.simpleName}") }
+                runOnUiThread { step("Datenbank-FEHLER: ${e.javaClass.simpleName} – bitte Bericht teilen.") }
             }
         }.start()
+    }
 
+    private fun startCompose() {
+        ReportLog.info("Startup", "Compose-Start durch Nutzer")
+        step("Compose wird gestartet …")
         setContent {
             EinkaufslisteTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
@@ -53,6 +62,26 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun shareReport() {
+        val report = try {
+            ReportLog.generate(
+                context = this,
+                openCount = 0,
+                doneCount = 0,
+                tags = emptyList(),
+                apiKeySet = false
+            )
+        } catch (e: Exception) {
+            "Bericht konnte nicht erzeugt werden: ${e.javaClass.simpleName}: ${e.message}"
+        }
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, "Einkaufsliste – Diagnose-Bericht")
+            putExtra(Intent.EXTRA_TEXT, report)
+        }
+        startActivity(Intent.createChooser(send, "Diagnose-Bericht teilen"))
+    }
+
     private fun step(message: String) {
         ReportLog.info("Startup", message)
         if (::statusView.isInitialized) {
@@ -60,7 +89,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Einfacher Status-Bildschirm ohne Compose-Abhaengigkeit. */
+    /** Reiner Android-View-Bildschirm ohne Compose-Abhängigkeit. */
     private fun buildStatusScreen(): LinearLayout {
         val container = LinearLayout(this)
         container.orientation = LinearLayout.VERTICAL
@@ -70,20 +99,57 @@ class MainActivity : ComponentActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
+        container.setPadding(48, 96, 48, 96)
+
         val title = TextView(this)
-        title.text = "Einkaufsliste startet …"
-        title.textSize = 22f
-        title.setPadding(32, 0, 32, 24)
+        title.text = "EINKAUFSLISTE"
+        title.textSize = 26f
+        title.setTypeface(null, Typeface.BOLD)
         title.gravity = Gravity.CENTER
         title.setTextColor(Color.rgb(0xD6, 0x28, 0x28))
         container.addView(title)
+
+        val version = TextView(this)
+        version.text = "Diagnose-Modus v1.18"
+        version.textSize = 14f
+        version.gravity = Gravity.CENTER
+        version.setPadding(0, 8, 0, 32)
+        version.setTextColor(Color.rgb(0x4A, 0x44, 0x3A))
+        container.addView(version)
+
         statusView = TextView(this)
         statusView.text = "Initialisierung …"
         statusView.textSize = 16f
         statusView.gravity = Gravity.CENTER
-        statusView.setPadding(32, 0, 32, 0)
+        statusView.setPadding(0, 0, 0, 48)
         statusView.setTextColor(Color.rgb(0x1D, 0x1D, 0x1B))
         container.addView(statusView)
+
+        val openButton = Button(this)
+        openButton.text = "Einkaufsliste öffnen"
+        openButton.textSize = 16f
+        openButton.setTextColor(Color.WHITE)
+        openButton.setBackgroundColor(Color.rgb(0xD6, 0x28, 0x28))
+        openButton.setOnClickListener { startCompose() }
+        container.addView(openButton)
+
+        val reportButton = Button(this)
+        reportButton.text = "Diagnose-Bericht teilen"
+        reportButton.textSize = 14f
+        reportButton.setTextColor(Color.rgb(0x1D, 0x1D, 0x1B))
+        reportButton.setBackgroundColor(Color.rgb(0xFF, 0xC8, 0x00))
+        reportButton.setOnClickListener {
+            Toast.makeText(this, "Bericht wird erzeugt …", Toast.LENGTH_SHORT).show()
+            shareReport()
+        }
+        val params = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.topMargin = 24
+        reportButton.layoutParams = params
+        container.addView(reportButton)
+
         return container
     }
 }
