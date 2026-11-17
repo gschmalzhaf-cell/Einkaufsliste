@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.19 – 2026-11-17
+
+Diagnose-Build: Comic-Schriften als Ursache des weißen Bildschirms prüfen.
+
+### Neu
+- **Zwei Öffnen-Knöpfe** im Diagnose-Startbildschirm: „Öffnen – mit Comic-Schriften“ (Bangers/Baloo 2) und „Öffnen – mit Standardschrift“ (Android-Standardschrift)
+- Rendert nur die Standardschrift-Variante, blockieren die eingebetteten Font-Dateien den ersten Compose-Frame auf Android 17 – dann wird die Schrift-Ladestrategie als Fix umgebaut
+
 ## v1.18 – 2026-11-18
 
 Diagnose-Build: Start ohne Compose, Bericht teilbar ohne funktionierende Oberfläche.

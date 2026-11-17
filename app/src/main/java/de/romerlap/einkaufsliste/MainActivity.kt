@@ -50,11 +50,11 @@ class MainActivity : ComponentActivity() {
         }.start()
     }
 
-    private fun startCompose() {
-        ReportLog.info("Startup", "Compose-Start durch Nutzer")
+    private fun startCompose(useComicFonts: Boolean) {
+        ReportLog.info("Startup", "Compose-Start durch Nutzer (Comic-Schriften: $useComicFonts)")
         step("Compose wird gestartet …")
         setContent {
-            EinkaufslisteTheme {
+            EinkaufslisteTheme(useComicFonts = useComicFonts) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     EinkaufslisteApp()
                 }
@@ -126,12 +126,26 @@ class MainActivity : ComponentActivity() {
         container.addView(statusView)
 
         val openButton = Button(this)
-        openButton.text = "Einkaufsliste öffnen"
+        openButton.text = "Öffnen – mit Comic-Schriften"
         openButton.textSize = 16f
         openButton.setTextColor(Color.WHITE)
         openButton.setBackgroundColor(Color.rgb(0xD6, 0x28, 0x28))
-        openButton.setOnClickListener { startCompose() }
+        openButton.setOnClickListener { startCompose(useComicFonts = true) }
         container.addView(openButton)
+
+        val openPlainButton = Button(this)
+        openPlainButton.text = "Öffnen – mit Standardschrift"
+        openPlainButton.textSize = 16f
+        openPlainButton.setTextColor(Color.WHITE)
+        openPlainButton.setBackgroundColor(Color.rgb(0x1D, 0x6F, 0xD1))
+        openPlainButton.setOnClickListener { startCompose(useComicFonts = false) }
+        val plainParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        plainParams.topMargin = 16
+        openPlainButton.layoutParams = plainParams
+        container.addView(openPlainButton)
 
         val reportButton = Button(this)
         reportButton.text = "Diagnose-Bericht teilen"
