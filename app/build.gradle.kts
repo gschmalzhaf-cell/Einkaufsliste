@@ -2,20 +2,21 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "de.romerlap.einkaufsliste"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "de.romerlap.einkaufsliste"
         minSdk = 26
-        targetSdk = 36
-        versionCode = 16
-        versionName = "1.15"
+        targetSdk = 35
+        versionCode = 17
+        versionName = "1.16"
     }
 
     signingConfigs {

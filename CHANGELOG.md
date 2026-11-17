@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.16 – 2026-11-17
+
+Behoben: Weißer Bildschirm auf Android 17 (Pixel 9 Pro) – Werkzeugkette auf den letzten funktionierenden Stand zurückgerollt.
+
+### Behoben
+- **Werkzeug-Rollback auf den v1.11-Stand**: AGP 8.10.1, Kotlin 2.1.20, Compose BOM 2025.09.00, Material 3 1.5.0-alpha04, Room 2.7.1, OkHttp 4.12.0, security-crypto 1.1.0-alpha06, Gradle 8.13, compileSdk 36, targetSdk 35 – das Update-Paket von v1.12 hat auf dem betroffenen Gerät (Android 17) das Rendern blockiert
+- **Alle Features bleiben erhalten**: Retro-Comic-Design, Comic-App-Icon, Diagnose-Bericht, asynchroner Keystore-Zugriff, sofort filternde Tag-Chips
+
 ## v1.15 – 2026-11-17
 
 Behoben: Weißer Bildschirm nach dem App-Start.
