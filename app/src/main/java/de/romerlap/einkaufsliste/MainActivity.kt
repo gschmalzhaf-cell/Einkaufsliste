@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /** UI-Bisect in Stufen: Farbschema -> Surface -> Scaffold -> kompletter Screen. */
+    @OptIn(ExperimentalMaterial3Api::class)
     private fun startStage(stage: Int) {
         ReportLog.info("Startup", "UI-Stufe $stage gestartet")
         setContent {
