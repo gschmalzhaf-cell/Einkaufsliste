@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.17 – 2026-11-18
+
+Diagnose-Build: weißer Bildschirm auf Android 17 weiter eingrenzen.
+
+### Neu
+- **Diagnose-Stufenbildschirm**: Beim Start erscheint kurz ein Status-Bildschirm aus reinen Android-Views (ohne Compose) mit Live-Status („App gestartet", „Datenbank OK", „Compose wird gestartet"). Bleibt er sichtbar, hängt Compose; verschwindet er, rendert Compose. Jede Stufe landet zusätzlich im Ereignisprotokoll
+- **Auto-Backup deaktiviert**: Android hat beim Neuinstallieren automatisch alte App-Daten aus der Cloud wiederhergestellt (Datenbank + verschlüsselter Speicher). Da Verschlüsselungsschlüssel nicht übertragen werden, kann diese Wiederherstellung den Start blockieren – neu installierte Versionen starten jetzt garantiert mit jungfräulichen Daten
+
 ## v1.16 – 2026-11-17
 
 Behoben: Weißer Bildschirm auf Android 17 (Pixel 9 Pro) – Werkzeugkette auf den letzten funktionierenden Stand zurückgerollt.
