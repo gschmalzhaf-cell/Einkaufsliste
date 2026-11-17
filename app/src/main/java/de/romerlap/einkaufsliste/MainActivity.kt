@@ -17,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.romerlap.einkaufsliste.data.AppDatabase
 import de.romerlap.einkaufsliste.ui.ListScreen
@@ -57,6 +58,40 @@ class MainActivity : ComponentActivity() {
             EinkaufslisteTheme(useComicFonts = useComicFonts) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     EinkaufslisteApp()
+                }
+            }
+        }
+    }
+
+    /** UI-Bisect in Stufen: Farbschema -> Surface -> Scaffold -> kompletter Screen. */
+    private fun startStage(stage: Int) {
+        ReportLog.info("Startup", "UI-Stufe $stage gestartet")
+        setContent {
+            EinkaufslisteTheme(useComicFonts = false) {
+                when (stage) {
+                    1 -> androidx.compose.foundation.layout.Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Surface(modifier = Modifier.fillMaxSize()) {
+                            androidx.compose.material3.Text("Stufe 1 OK: Farbschema + Surface")
+                        }
+                    }
+                    2 -> androidx.compose.material3.Scaffold(
+                        topBar = {
+                            androidx.compose.material3.TopAppBar(
+                                title = { androidx.compose.material3.Text("Stufe 2") }
+                            )
+                        }
+                    ) { innerPadding ->
+                        androidx.compose.material3.Surface(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        ) {
+                            androidx.compose.material3.Text("Stufe 2 OK: Scaffold + TopAppBar")
+                        }
+                    }
+                    else -> EinkaufslisteApp()
                 }
             }
         }
@@ -139,41 +174,26 @@ class MainActivity : ComponentActivity() {
         statusView.setTextColor(Color.rgb(0x1D, 0x1D, 0x1B))
         container.addView(statusView)
 
-        val openButton = Button(this)
-        openButton.text = "Öffnen – mit Comic-Schriften"
-        openButton.textSize = 16f
-        openButton.setTextColor(Color.WHITE)
-        openButton.setBackgroundColor(Color.rgb(0xD6, 0x28, 0x28))
-        openButton.setOnClickListener { startCompose(useComicFonts = true) }
-        container.addView(openButton)
+        fun stageButton(label: String, stage: Int, bg: Int): Button {
+            val b = Button(this)
+            b.text = label
+            b.textSize = 15f
+            b.setTextColor(Color.WHITE)
+            b.setBackgroundColor(bg)
+            b.setOnClickListener { startStage(stage) }
+            val lp = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            lp.topMargin = 16
+            b.layoutParams = lp
+            return b
+        }
+        container.addView(stageButton("Stufe 1: Farbschema + Surface", 1, Color.rgb(0xD6, 0x28, 0x28)))
+        container.addView(stageButton("Stufe 2: Scaffold + TopAppBar", 2, Color.rgb(0x1D, 0x6F, 0xD1)))
+        container.addView(stageButton("Stufe 3: Kompletter Bildschirm (ListScreen)", 3, Color.rgb(0x2E, 0x7D, 0x32)))
 
-        val miniTestButton = Button(this)
-        miniTestButton.text = "Compose Mini-Test (nackter Text)"
-        miniTestButton.textSize = 14f
-        miniTestButton.setTextColor(Color.rgb(0x1D, 0x1D, 0x1B))
-        miniTestButton.setBackgroundColor(Color.rgb(0xFF, 0xB7, 0x03))
-        miniTestButton.setOnClickListener { startComposeMiniTest() }
-        val miniParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        miniParams.topMargin = 16
-        miniTestButton.layoutParams = miniParams
-        container.addView(miniTestButton)
 
-        val openPlainButton = Button(this)
-        openPlainButton.text = "Öffnen – mit Standardschrift"
-        openPlainButton.textSize = 16f
-        openPlainButton.setTextColor(Color.WHITE)
-        openPlainButton.setBackgroundColor(Color.rgb(0x1D, 0x6F, 0xD1))
-        openPlainButton.setOnClickListener { startCompose(useComicFonts = false) }
-        val plainParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        plainParams.topMargin = 16
-        openPlainButton.layoutParams = plainParams
-        container.addView(openPlainButton)
 
         val reportButton = Button(this)
         reportButton.text = "Diagnose-Bericht teilen"

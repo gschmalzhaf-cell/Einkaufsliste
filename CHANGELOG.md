@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.21 – 2026-11-17
+
+Diagnose-Build: UI-Baum in Stufen bisecten.
+
+### Neu
+- **Stufen-Knöpfe**: „Stufe 1: Farbschema + Surface“, „Stufe 2: Scaffold + TopAppBar“, „Stufe 3: Kompletter Bildschirm (ListScreen)“ – jede Stufe startet genau diese UI-Teile im Compose-Theme der App (Standard-Schrift, da Schriftarten entlastet sind)
+- **Erkenntnisstand**: Compose selbst rendert (Mini-Test OK), Schriften entlastet, Datenbank OK, kein Absturz – die Grenze liegt zwischen `MaterialTheme + Text` (geht) und dem kompletten `ListScreen` (weiß)
+
 ## v1.20 – 2026-11-17
 
 Diagnose-Build: Rendert pures Compose auf dem Gerät?
