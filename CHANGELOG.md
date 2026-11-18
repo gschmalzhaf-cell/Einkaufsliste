@@ -3,6 +3,18 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.26 – 2026-11-18
+
+Behoben: Weißer Bildschirm auf Android 17 (Pixel 9 Pro) – finaler Fix und Bereinigung.
+
+### Behoben
+- **Ursache gefunden**: Auf Android 17 blockierte die synchrone Room-Datenbank-Initialisierung auf dem Haupt-Thread bei der ViewModel-Erstellung – die Komposition kam nie zum Start (über die Stufen-Diagnose eingegrenzt: Farbschema/Scaffold/Mini-Test funktionierten, nur der komplette Screen blieb weiß, und nicht einmal der erste Kompositions-Marker wurde erreicht)
+- **Fix**: Die Datenbank wird beim App-Start sofort im Hintergrund vorgewärmt; der Haupt-Thread findet die Instanz fertig vor und startet die Oberfläche ohne Verzögerung. Auf dem Testgerät bestätigt: Die App startet wieder normal
+
+### Bereinigt
+- Diagnose-Startbildschirm, Stufen-Knöpfe, Mini-Test und Kompositions-Marker entfernt – normaler App-Start wiederhergestellt
+- **Bleiben**: Diagnose-Bericht (Einstellungen → Diagnose-Bericht), persistentes Ereignisprotokoll, Absturzaufzeichnung, DB-Vorwärmung als dauerhafter Fix, deaktiviertes Auto-Backup
+
 ## v1.25 – 2026-11-18
 
 Diagnose-Build: ViewModel-Erstellung präzise markieren, DB-Vorwärmung.

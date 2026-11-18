@@ -67,19 +67,8 @@ import de.romerlap.einkaufsliste.ui.theme.comicSticker
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(viewModel: ListViewModel) {
-    // --- Diagnose-Marker: letzte Marke im Bericht = Hangepunkt der Komposition ---
-    val diagLogged = remember { mutableStateOf(setOf<String>()) }
-    fun logOnce(msg: String) {
-        if (msg !in diagLogged.value) {
-            diagLogged.value = diagLogged.value + msg
-            ReportLog.info("ListScreen", msg)
-        }
-    }
-    logOnce("1 Komposition betreten")
-
     val items by viewModel.items.collectAsState()
     val allTags = items.mapNotNull { it.tag }.distinct().sorted()
-    logOnce("2 Items-Status abgerufen (${items.size})")
     var showAddSheet by rememberSaveable { mutableStateOf(false) }
     var showManualDialog by rememberSaveable { mutableStateOf(false) }
     var showRecipeSheet by rememberSaveable { mutableStateOf(false) }
@@ -116,7 +105,6 @@ fun ListScreen(viewModel: ListViewModel) {
         if (granted) cameraLauncher.launch(null) else permissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
-    logOnce("3 vor Scaffold")
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -143,10 +131,8 @@ fun ListScreen(viewModel: ListViewModel) {
                     }
                 }
             )
-            logOnce("4 TopAppBar komponiert")
         },
         floatingActionButton = {
-            logOnce("8 FAB wird komponiert")
             ExtendedFloatingActionButton(
                 onClick = { showAddSheet = true },
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -172,7 +158,6 @@ fun ListScreen(viewModel: ListViewModel) {
             }
         }
 
-        logOnce("5 Content betreten (sichtbar: ${visible.size})")
         if (visible.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -188,7 +173,6 @@ fun ListScreen(viewModel: ListViewModel) {
                 )
             }
         } else {
-            logOnce("6 LazyColumn wird komponiert")
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -228,7 +212,6 @@ fun ListScreen(viewModel: ListViewModel) {
                 }
             }
         }
-        logOnce("7 Content-Komposition abgeschlossen")
     }
 
     if (showAddSheet) {
