@@ -140,5 +140,4 @@ class MainActivity : ComponentActivity() {
         container.addView(openButton)
         return container
     }
-    }
 }
