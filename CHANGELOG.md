@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.32 – 2026-11-18
+
+Behoben: Komposition startet auf Android 17 nur nach Nutzertipp – Start per Knopf.
+
+### Behoben
+- **Beweislage (Bericht v1.31)**: Bei Nutzer-tipp-gestartetem Compose (v1.25) liefen alle Kompositions-Marken und der Screen renderte; bei zeitgesteuertem Compose-Start (postDelayed, v1.26–v1.31) startete die Komposition nie (nicht einmal Marke 1). Das frühere Tipp-Sicherheitsnetz traf zudem nie: Der damalige TextView hatte keine Layout-Parameter (WRAP_CONTENT) und war nur so groß wie sein Text – Tips in die Bildschirmmitte trafen ihn nicht
+- **Fix**: Die App öffnet mit einem	Startbildschirm: großer roter Knopf „Einkaufsliste öffnen“, aktiviert sobald die Datenbank vorgewärmt ist (normalerweise sofort). Compose startet ausschließlich aus dem Klick-Handler – dem nachweislich funktionierenden Pfad auf Android 17 –, nicht mehr per Zeitplan
+- **Watchdog (ab App-Start)**: Startet die Komposition nie innerhalb von 30 Sekunden (Marke 1 fehlt), wird der Diagnose-Bericht automatisch geteilt; der Berichts-Knopf bleibt zusätzlich verfügbar
+
 ## v1.31 – 2026-11-19
 
 Diagnose: Bericht auch bei weißem Bildschirm teilbar + Watchdog + DB-Warten ohne Timeout.

@@ -23,18 +23,22 @@ class MainActivity : ComponentActivity() {
         // blockiert auf Android 17 das komplette Fenster).
         val loadingScreen = buildLoadingScreen()
         setContentView(loadingScreen)
-        ReportLog.info("Startup", "Ladebildschirm gesetzt (mit Berichts-Knopf)")
+        ReportLog.info("Startup", "Ladebildschirm gesetzt (mit Öffnen-Knopf)")
 
+        // Compose startet NUR per Nutzertipp (Auf Android 17 startet die Komposition
+        // bei zeitgesteuertem Start nachweislich nie). Der Knopf wird aktiviert,
+        // sobald die Datenbank vorgewärmt ist.
+        val openButton = loadingScreen.findViewWithTag<android.widget.Button>("open")
         Thread {
-            // Auf DB-Vorwaermung OHNE Timeout warten – der Haupt-Thread baut nie selbst
             (application as EinkaufslisteApp).dbReady.await()
             ReportLog.info("Startup", "DB vorgewärmt (dbReady)")
             runOnUiThread {
-                ReportLog.info("Startup", "DB bereit – Compose-Start geplant")
-                // Echte Frames des Ladebildschirms zulassen, dann Compose starten
-                loadingScreen.postDelayed({ startComposeUi() }, 800)
+                openButton.isEnabled = true
+                openButton.text = "Einkaufsliste öffnen"
+                ReportLog.info("Startup", "Öffnen-Knopf aktiviert")
             }
         }.start()
+        armWatchdog()
     }
 
     /** Teilt den Diagnose-Bericht (reine System-UI, unabhaengig von Compose). */
@@ -53,23 +57,23 @@ class MainActivity : ComponentActivity() {
         startActivity(android.content.Intent.createChooser(send, "Diagnose-Bericht teilen"))
     }
 
-    /** Watchdog: bleibt die Komposition haengen, wird der Bericht automatisch geteilt. */
+    /** Watchdog: startet die Komposition nie (Marke 1), wird der Bericht geteilt. */
     private fun armWatchdog() {
         Thread {
             try {
-                Thread.sleep(10_000)
+                Thread.sleep(30_000)
             } catch (_: InterruptedException) {
                 return@Thread
             }
-            val finished = try {
+            val started = try {
                 val log = getSharedPreferences("report_log", MODE_PRIVATE)
                     .getString("event_log", "").orEmpty()
-                log.contains("4 Scaffold-Content abgeschlossen")
+                log.contains("1 Komposition betreten")
             } catch (_: Exception) {
                 false
             }
-            if (!finished) {
-                ReportLog.error("Startup", "Watchdog: Komposition nach 10 s nicht abgeschlossen – Bericht wird geteilt")
+            if (!started) {
+                ReportLog.error("Startup", "Watchdog: Komposition nie gestartet – Bericht wird geteilt")
                 runOnUiThread { shareReportNow() }
             }
         }.start()
@@ -78,7 +82,6 @@ class MainActivity : ComponentActivity() {
     private fun startComposeUi() {
         if (composeStarted.getAndSet(true)) return
         ReportLog.info("Startup", "Compose wird gestartet (Thread ${Thread.currentThread().name})")
-        armWatchdog()
         setContent {
             EinkaufslisteTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
@@ -117,6 +120,16 @@ class MainActivity : ComponentActivity() {
         hint.setPadding(0, 16, 0, 48)
         hint.setTextColor(android.graphics.Color.rgb(0x4A, 0x44, 0x3A))
         container.addView(hint)
+
+        val openButton = android.widget.Button(this)
+        openButton.tag = "open"
+        openButton.text = "Datenbank wird geladen …"
+        openButton.textSize = 18f
+        openButton.setTextColor(android.graphics.Color.WHITE)
+        openButton.setBackgroundColor(android.graphics.Color.rgb(0xD6, 0x28, 0x28))
+        openButton.isEnabled = false
+        openButton.setOnClickListener { startComposeUi() }
+        container.addView(openButton)
 
         val reportButton = android.widget.Button(this)
         reportButton.text = "Diagnose-Bericht teilen"
