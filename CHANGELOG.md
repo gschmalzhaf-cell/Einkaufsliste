@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.30 – 2026-11-18
+
+Behoben: Comic-Schriftdateien blockieren auf Android 17 die erste Textmessung.
+
+### Behoben
+- **Ursache (endgültig eingegrenzt)**: Jeder funktionierende Testfall lief mit Standard- bzw. ohne eigene Schriften (Mini-Test, Stufe 1–2, v1.25 Stufe 3 mit Standardschrift); jeder weiße Bildschirm hatte die eingebetteten Comic-Schriften (Bangers/Baloo 2) im Spiel – beim Aufräumen von v1.26 wurde die Standardschrift-Option entfernt, seither blieb Compose weiß. Auf Android 17 blockiert das Laden der Schrift-Ressourcen die erste Textmessung, sodass der erste Frame nie gezeichnet wird
+- **Fix**: Auf Android 17 (API 37+) verwendet die App automatisch die Android-Standardschriften; auf älteren Versionen bleiben Bangers/Baloo 2 aktiv. Farben, Sticker-Karten und Comic-Look bleiben überall erhalten
+
 ## v1.29 – 2026-11-18
 
 Diagnose-Build: Start-Kette vollstaendig protokollieren (Ladebildschirm rendert, Compose bleibt weiß).

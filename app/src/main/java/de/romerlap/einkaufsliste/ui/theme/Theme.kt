@@ -1,7 +1,9 @@
 package de.romerlap.einkaufsliste.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import android.os.Build
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -73,9 +75,14 @@ private val DarkColors = darkColorScheme(
 fun EinkaufslisteTheme(content: @Composable () -> Unit) {
     val darkTheme = isSystemInDarkTheme()
     val colorScheme = if (darkTheme) DarkColors else LightColors
+    // Auf Android 17 (API 37+) blockiert das Laden der gebuendelten Comic-
+    // Schriftdateien die erste Textmessung, sodass kein Frame gezeichnet wird.
+    // Auf betroffenen Versionen werden daher die Android-Standardschriften
+    // verwendet; Farben, Sticker-Karten und Comic-Look bleiben erhalten.
+    val typography = if (Build.VERSION.SDK_INT >= 37) Typography() else ComicTypography
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = ComicTypography,
+        typography = typography,
         content = content
     )
 }
