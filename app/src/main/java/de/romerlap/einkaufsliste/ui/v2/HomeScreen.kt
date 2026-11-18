@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
@@ -74,7 +73,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.ListViewModel
 import de.romerlap.einkaufsliste.ReportLog
-import de.romerlap.einkaufsliste.ShoppingItem
+import de.romerlap.einkaufsliste.data.ShoppingItem
 import de.romerlap.einkaufsliste.ui.ApiKeyDialog
 import de.romerlap.einkaufsliste.ui.ManualAddDialog
 import de.romerlap.einkaufsliste.ui.PhotoResultSheet
