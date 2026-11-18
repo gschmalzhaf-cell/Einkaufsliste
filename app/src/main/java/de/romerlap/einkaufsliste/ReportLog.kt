@@ -28,7 +28,34 @@ object ReportLog {
     private fun add(level: String, source: String, message: String) {
         if (entries.size >= MAX_ENTRIES) entries.removeFirst()
         val firstLine = message.lineSequence().firstOrNull().orEmpty().take(300)
-        entries.addLast("${timeFormat.format(Date())} $level $source: $firstLine")
+        val entry = "${timeFormat.format(Date())} $level $source: $firstLine"
+        entries.addLast(entry)
+        persist(entry)
+    }
+
+    /** Ereignis dauerhaft speichern – ueberlebt App-Neustarts ( fuer die Diagnose ). */
+    private fun persist(entry: String) {
+        appContext?.let { ctx ->
+            try {
+                val key = "event_log"
+                val prefs = ctx.getSharedPreferences("report_log", Context.MODE_PRIVATE)
+                val existing = prefs.getString(key, null).orEmpty()
+                val lines = (if (existing.isEmpty()) emptyList() else existing.split("\n")).toMutableList()
+                lines.add(entry)
+                while (lines.size > MAX_ENTRIES) lines.removeAt(0)
+                prefs.edit().putString(key, lines.joinToString("\n")).apply()
+            } catch (_: Exception) {
+                // Persistenz darf den Betrieb niemals blockieren
+            }
+        }
+    }
+
+    /** Kontext fuer die persistente Speicherung (von der Application gesetzt). */
+    @Volatile
+    private var appContext: Context? = null
+
+    fun init(context: Context) {
+        appContext = context.applicationContext
     }
 
     @Synchronized

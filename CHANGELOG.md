@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.23 – 2026-11-18
+
+Diagnose-Build: Ereignisprotokoll persistent machen.
+
+### Behoben
+- **Ereignisprotokoll überlebt Neustarts**: Jeder Protokolleintrag wird zusätzlich dauerhaft gespeichert (SharedPreferences). Bisher lag das Protokoll im Arbeitsspeicher – beim Schließen der App zum Wechseln zum Diagnose-Bildschirm wurden die Kompositions-Marken mit dem Prozess gelöscht, weshalb der Bericht keine ListScreen-Marken enthielt
+- Die 8 Kompositions-Marken des ListScreen stehen damit im nächsten Bericht zur Verfügung
+
 ## v1.22 – 2026-11-18
 
 Diagnose-Build: Feinmarken in der ListScreen-Komposition.

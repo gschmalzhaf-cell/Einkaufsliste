@@ -17,6 +17,7 @@ class EinkaufslisteApp : Application() {
                 }
                 defaultHandler?.uncaughtException(thread, throwable)
             }
+            ReportLog.init(this)
             ReportLog.info("App", "Gestartet (Android ${android.os.Build.VERSION.RELEASE})")
         } catch (e: Exception) {
             // Der App-Start darf an der Diagnose niemals scheitern
