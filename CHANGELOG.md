@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v2.1.0 – 2026-11-19
+
+Neu: Konfetti-Burst für erledigte Aufgaben.
+
+### Neu
+- **Konfetti-Burst**: 90 saison-farbige Konfetti-Partikel explodieren aus der Bildmitte, fliegen mit Schwerkraft-Bogen auseinander, rotieren und verblassen (1,4 s Canvas-Animation)
+- **Zwei Auslöser, vollautomatisch**: (1) Tippen auf „Erledigte entfernen“ (Doppelhaken) – der Klassiker beim Aufräumen; (2) Abhaken des letzten offenen Artikels – die Liste ist geschafft! 🎉
+- Farbige Partikel aus der aktiven Saison-Palette (Winter: Blau/Gold/Eisblau)
+
 ## v2.0.0 – 2026-11-19
 
 Version 2: „Einkaufsliste – Cozy Seasons". Kompletter UI-Neuaufbau mit saisonaler Engine und Motion-Layer (Design-Freigabe: design/v2).

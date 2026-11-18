@@ -140,10 +140,14 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
     }
     val open = prioritized.filter { !it.isChecked }
     val done = prioritized.filter { it.isChecked }
+    var burstTick by remember { mutableStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize().background(season.background)) {
         // Motion-Layer: Saison-Partikel hinter allem
         ParticleLayer(modifier = Modifier.fillMaxSize())
+        if (burstTick > 0) {
+            ConfettiOverlay(seed = burstTick, season = season)
+        }
 
         Column(
             modifier = Modifier
@@ -176,7 +180,7 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                 Row(modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
                     if (items.any { it.isChecked }) {
                         IconButton(onClick = {
-                            celebrate()
+                            burstTick++
                             viewModel.deleteChecked()
                         }) {
                             Icon(Icons.Filled.DoneAll, contentDescription = "Erledigte entfernen", tint = season.secondary)
@@ -245,7 +249,15 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                 if (open.isNotEmpty()) {
                     item { SectionPill("Offen", season.secondary) }
                     items(open, key = { it.id }) { item ->
-                        CozyCard(item = item, season = season, onToggle = { viewModel.toggle(item) }, onDelete = { viewModel.delete(item) })
+                        CozyCard(
+                            item = item,
+                            season = season,
+                            onToggle = {
+                                if (open.size == 1) burstTick++ // letzter offener Artikel: Liste geschafft!
+                                viewModel.toggle(item)
+                            },
+                            onDelete = { viewModel.delete(item) }
+                        )
                     }
                 }
                 if (done.isNotEmpty()) {
@@ -349,13 +361,53 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
     }
 }
 
-/** Konfetti-Feier: Protokoll-Hook – der volle Bursta folgt im Motion-Ausbau. */
-private var lastCelebrate = 0L
-private fun celebrate() {
-    val now = System.currentTimeMillis()
-    if (now - lastCelebrate > 1000) {
-        ReportLog.info("Motion", "Liste geschafft – Konfetti")
-        lastCelebrate = now
+/**
+ * Konfetti-Burst: Saison-farbige Partikel explodieren von der Bildmitte aus,
+ * fliegen mit Schwerkraft auseinander und verblassen. Laeuft ~1,4 s.
+ */
+@Composable
+private fun ConfettiOverlay(seed: Int, season: SeasonColors) {
+    val progress = remember { androidx.compose.animation.core.Animatable(0f) }
+    LaunchedEffect(seed) {
+        progress.snapTo(0f)
+        progress.animateTo(
+            targetValue = 1f,
+            animationSpec = androidx.compose.animation.core.tween(
+                durationMillis = 1400,
+                easing = androidx.compose.animation.core.LinearEasing
+            )
+        )
+    }
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val p = progress.value
+        if (p >= 1f) return@Canvas
+        val rand = kotlin.random.Random(seed)
+        val cx = size.width / 2f
+        val cy = size.height * 0.55f
+        repeat(90) { i ->
+            val angle = rand.nextFloat() * 2f * Math.PI.toFloat()
+            val dist = 0.08f + rand.nextFloat() * 0.35f
+            val spin = rand.nextFloat() * 720f * p
+            val color = when (i % 4) {
+                0 -> season.primary
+                1 -> season.secondary
+                2 -> season.deco
+                else -> season.deco2
+            }
+            val px = cx + (kotlin.math.cos(angle) * dist * p * size.width)
+            val py = cy + (kotlin.math.sin(angle) * dist * p * size.height * 0.6f)
+                + 0.30f * p * p * size.height
+            val alpha = (1f - p).coerceIn(0f, 1f)
+            rotate(spin, pivot = androidx.compose.ui.geometry.Offset(px, py + 6f)) {
+                drawRoundRect(
+                    color = color,
+                    topLeft = androidx.compose.ui.geometry.Offset(px, py),
+                    size = androidx.compose.ui.geometry.Size(9f, 14f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(3f),
+                    alpha = alpha
+                )
+            }
+        }
     }
 }
 
