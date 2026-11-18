@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.22 – 2026-11-18
+
+Diagnose-Build: Feinmarken in der ListScreen-Komposition.
+
+### Neu
+- **8 Kompositions-Marken** im ListScreen (Komposition betreten → Items abgerufen → vor Scaffold → TopAppBar → Content → LazyColumn → Content abgeschlossen → FAB); jede Marke landet einmalig im Ereignisprotokoll
+- **Lesart**: Die letzte Marke im Diagnose-Bericht zeigt exakt die Stelle, an der die Komposition hängt. Fehlt keine Marke (alle 8 da) und der Bildschirm bleibt weiß, liegt das Problem nicht in der Komposition, sondern in Measure/Draw-Phase – dann sind ComicCard/Offsets die nächsten Verdächtigen
+- Erkenntnisstand: Stufe 1 (Farbschema + Surface) und Stufe 2 (Scaffold + TopAppBar) rendern korrekt, nur der komplette ListScreen bleibt weiß
+
 ## v1.21 – 2026-11-17
 
 Diagnose-Build: UI-Baum in Stufen bisecten.
