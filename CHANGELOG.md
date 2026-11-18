@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.31 – 2026-11-19
+
+Diagnose: Bericht auch bei weißem Bildschirm teilbar + Watchdog + DB-Warten ohne Timeout.
+
+### Neu
+- **Berichts-Knopf auf dem Ladebildschirm**: „Diagnose-Bericht teilen“ ist jetzt direkt beim Start verfügbar – der Bericht lässt sich teilen, egal was mit Compose passiert (Teilen läuft über reine System-UI)
+- **Watchdog**: Kommt die Komposition 10 Sekunden nach dem Compose-Start nicht bis zur letzten Marke, teilt die App den Diagnose-Bericht automatisch
+- **DB-Wartezeit ohne Timeout**: Der Start von Compose wartet unbegrenzt auf die vorgewärmte Datenbank – der Haupt-Thread baut die Datenbank nie selbst
+
 ## v1.30 – 2026-11-18
 
 Behoben: Comic-Schriftdateien blockieren auf Android 17 die erste Textmessung.
