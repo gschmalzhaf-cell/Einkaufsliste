@@ -3,6 +3,21 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v2.0.0 – 2026-11-19
+
+Version 2: „Einkaufsliste – Cozy Seasons". Kompletter UI-Neuaufbau mit saisonaler Engine und Motion-Layer (Design-Freigabe: design/v2).
+
+### Neu
+- **SeasonEngine**: Jahreszeit automatisch per meteorologischem Datum (Frühling/Sommer/Herbst/Winter) mit je eigener Cozy-Palette (Primary, Sekundär, Hintergrund, Himmel, Partikelfarben); im Dunkelmodus warm abgedimmte Flächen
+- **Motion-Layer**: saisonale Partikel-Engine als Canvas hinter dem Inhalt – schwebende Blütenblätter (Frühling), Sonnenstaub + atmende Sonnenscheibe (Sommer), wirbelnde Herbstblätter (Herbst), sanfter Schneefall (Winter); pausiert automatisch im Hintergrund
+- **Kamera-Loch als Anker**: pulsierender Jahreszeiten-Ring um das Pixel-9-Pro-Cutout in der Kopfzeile
+- **Cozy UI**: Karten mit 26-px-Radius und weichem Schatten, runde Chips (filtern weiterhin sofort, „Ohne Tag“-Priorität bleibt), Sektions-Pills, zentrierte FAB-Pille
+- **Feder-Physik**: Abhaken federt (Checkbox-Bounce + Karten-Scale); „Erledigte entfernen“ feiert als Konfetti-Hook (vollständiger Bursta folgt)
+- Alle v1-Features bleiben: Tags, Foto-/Rezept-KI, Diagnose-Bericht, DB-Vorwärmung, tap-gated Compose-Start, Android-17-Schrift-Fallback
+
+### Technik
+- Neuer UI-Layer `ui/v2` (HomeScreen, SeasonTheme, ParticleLayer, Season); Datenbasis (Room), KI und Bericht unverändert – Datenbestand bleibt vollständig erhalten
+
 ## v1.34 – 2026-11-18
 
 Final: Weißer-Bildschirm-Problem vollständig behoben – Diagnose-Marken entfernt, Fixes bleiben.

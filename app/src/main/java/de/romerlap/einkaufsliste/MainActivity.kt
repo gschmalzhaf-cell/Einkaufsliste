@@ -6,8 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import de.romerlap.einkaufsliste.ui.ListScreen
-import de.romerlap.einkaufsliste.ui.theme.EinkaufslisteTheme
+import de.romerlap.einkaufsliste.ui.v2.HomeScreen
+import de.romerlap.einkaufsliste.ui.v2.SeasonTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,12 +80,12 @@ class MainActivity : ComponentActivity() {
         if (composeStarted.getAndSet(true)) return
         ReportLog.info("Startup", "Compose wird gestartet (Thread ${Thread.currentThread().name})")
         // Exakt der Aufrufbaum, der am 11:24:50-Beweisprotokoll funktionierte
-        // (v1.25): EinkaufslisteTheme -> viewModel -> EinkaufslisteApp.
+        // (v1.25, adaptiert): SeasonTheme -> viewModel -> HomeScreen.
         // KEIN Surface-Wrapper (blockiert auf Android 17 die Komposition).
         setContent {
-            EinkaufslisteTheme {
+            SeasonTheme {
                 val vm = viewModel<ListViewModel>()
-                EinkaufslisteApp(vm)
+                HomeScreen(vm)
             }
         }
     }
@@ -139,9 +139,4 @@ class MainActivity : ComponentActivity() {
         container.addView(reportButton)
         return container
     }
-}
-
-@Composable
-fun EinkaufslisteApp(viewModel: ListViewModel = viewModel()) {
-    ListScreen(viewModel)
 }
