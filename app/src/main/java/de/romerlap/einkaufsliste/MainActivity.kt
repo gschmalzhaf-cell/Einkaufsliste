@@ -4,10 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.romerlap.einkaufsliste.ui.ListScreen
 import de.romerlap.einkaufsliste.ui.theme.EinkaufslisteTheme
@@ -82,11 +79,13 @@ class MainActivity : ComponentActivity() {
     private fun startComposeUi() {
         if (composeStarted.getAndSet(true)) return
         ReportLog.info("Startup", "Compose wird gestartet (Thread ${Thread.currentThread().name})")
+        // Exakt der Aufrufbaum, der am 11:24:50-Beweisprotokoll funktionierte
+        // (v1.25): EinkaufslisteTheme -> viewModel -> EinkaufslisteApp.
+        // KEIN Surface-Wrapper (blockiert auf Android 17 die Komposition).
         setContent {
             EinkaufslisteTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    EinkaufslisteApp()
-                }
+                val vm = viewModel<ListViewModel>()
+                EinkaufslisteApp(vm)
             }
         }
     }

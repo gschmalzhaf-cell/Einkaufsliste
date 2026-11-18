@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.33 – 2026-11-18
+
+Behoben: Surface-Wurzel blockiert auf Android 17 die Komposition – exakt bewiesener v1.25-Aufrufbaum wiederhergestellt.
+
+### Behoben
+- **Beweislage**: Der einzige je funktionierende komplette App-Start (v1.25, 11:24:50) lief über `EinkaufslisteTheme → viewModel → EinkaufslisteApp` ohne Surface-Wrapper; alle weißen Starts (v1.26–v1.32, auch per Nutzertipp vom Knopf) hatten zusätzlich `Surface(fillMaxSize)` an der Wurzel – und die Komposition startete nie (keine Marke 1), dh. die Blockade liegt in genau dieser äußeren Schicht
+- **Fix**: `startComposeUi()` stellt exakt den bewiesenen v1.25-Aufrufbaum wieder her: `setContent { EinkaufslisteTheme { viewModel(); EinkaufslisteApp(vm) } }` – ohne Surface. Die Liste zeichnet ihren Hintergrund selbst (Scaffold), der kein Funktionsverlust entsteht
+- Start per Knopf, Öffnen-Knopf-Aktivierung nach DB-Vorwärmung, Watchdog und Berichts-Knopf bleiben unverändert
+
 ## v1.32 – 2026-11-18
 
 Behoben: Komposition startet auf Android 17 nur nach Nutzertipp – Start per Knopf.
