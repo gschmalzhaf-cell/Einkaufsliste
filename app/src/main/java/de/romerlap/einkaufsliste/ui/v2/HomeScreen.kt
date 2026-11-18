@@ -150,46 +150,64 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
             ConfettiOverlay(seed = burstTick, season = season)
         }
 
+        // Notch-Anker: Ring exakt im Statusleisten-Band (Cutout-Position,
+        // Pixel 9 Pro: mittig). Sommer: die Sonne wandert um das Loch.
+        val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+        Canvas(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .height(topInset + 6.dp)
+        ) {
+            val cx = size.width / 2f
+            val cy = (topInset.toPx()) / 2f
+            val pulse = 26f + sin(System.nanoTime() / 800_000_000.0).toFloat() * 2.5f
+            drawCircle(season.primary, pulse, center = Offset(cx, cy), alpha = 0.55f)
+            drawCircle(season.primary, pulse + 8f, center = Offset(cx, cy), alpha = 0.18f)
+            if (season.season.particle == Season.ParticleKind.SUN) {
+                // Sonne wandert langsam um das Kamera-Loch
+                val a = System.nanoTime() / 12_000_000_000.0
+                val sx = cx + (kotlin.math.cos(a) * 74f).toFloat()
+                val sy = cy + (kotlin.math.sin(a) * 30f).toFloat()
+                drawCircle(Color(0xFFF5D77A), 13f, center = Offset(sx, sy), alpha = 0.95f)
+                drawCircle(Color(0xFFF2A93B), 26f, center = Offset(sx, sy), alpha = 0.20f)
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(WindowInsets.systemBars.asPaddingValues())
         ) {
-            // ---- Kopf: Kamera-Loch-Anker + Titel + Saison ----
-            Box(modifier = Modifier.fillMaxWidth().height(64.dp)) {
-                Canvas(modifier = Modifier.matchParentSize()) {
-                    val cx = size.width / 2f
-                    val cy = size.height / 2f
-                    val pulse = 26f + sin(System.nanoTime() / 800_000_000.0).toFloat() * 2.5f
-                    drawCircle(season.primary, pulse, center = Offset(cx, cy), alpha = 0.55f)
-                    drawCircle(season.primary, pulse + 8f, center = Offset(cx, cy), alpha = 0.18f)
+            // ---- Kopf: Titel + Saison + Aktionen (keine Ueberlappung) ----
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 24.dp, end = 8.dp, top = 8.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        "Einkaufsliste",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = season.primary
+                    )
+                    Text(
+                        season.season.label,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = season.soft
+                    )
                 }
-                Text(
-                    "Einkaufsliste",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = season.primary,
-                    modifier = Modifier.padding(start = 24.dp).align(Alignment.CenterStart)
-                )
-                Text(
-                    season.season.label,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = season.soft,
-                    modifier = Modifier
-                        .padding(start = 26.dp, bottom = 10.dp)
-                        .align(Alignment.BottomStart)
-                )
-                Row(modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
-                    if (items.any { it.isChecked }) {
-                        IconButton(onClick = {
-                            burstTick++
-                            viewModel.deleteChecked()
-                        }) {
-                            Icon(Icons.Filled.DoneAll, contentDescription = "Erledigte entfernen", tint = season.secondary)
-                        }
+                if (items.any { it.isChecked }) {
+                    IconButton(onClick = {
+                        burstTick++
+                        viewModel.deleteChecked()
+                    }) {
+                        Icon(Icons.Filled.DoneAll, contentDescription = "Erledigte entfernen", tint = season.secondary)
                     }
-                    IconButton(onClick = { showSettings = true }) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Einstellungen", tint = season.soft)
-                    }
+                }
+                IconButton(onClick = { showSettings = true }) {
+                    Icon(Icons.Filled.Settings, contentDescription = "Einstellungen", tint = season.soft)
                 }
             }
 

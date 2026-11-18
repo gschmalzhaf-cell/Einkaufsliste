@@ -81,14 +81,6 @@ fun ParticleLayer(modifier: Modifier = Modifier) {
                 }
             }
         }
-        // Sommer: sanfte Sonnenscheibe oben rechts (statisch gezeichnet, atmend)
-        if (kind == Season.ParticleKind.SUN) {
-            val sunX = w * 0.86f
-            val sunY = h * 0.06f
-            val breathe = 34f + sin(time * 0.8f) * 3f
-            drawCircle(Color(0xFFF5D77A), breathe, Offset(sunX, sunY), 0.85f)
-            drawCircle(Color(0xFFF2A93B), 46f, Offset(sunX, sunY), 0.25f)
-        }
     }
 }
 

@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v2.2.0 – 2026-11-19
+
+Behoben: Kopfzeilen-Texte, Notch-Ausrichtung und „Debug-Modus“ beim Start.
+
+### Behoben
+- **Text-Überlappungen**: Titel und Saison-Kicker stehen jetzt in einem sauberen Spalten-Layout (keine absoluten Positionen mehr); Aktions-Icons rechts daneben
+- **Notch-Konzept**: Der Jahreszeiten-Ring sitzt exakt im Statusleisten-Band auf der Höhe des echten Kamera-Lochs (statt darunter); im Sommer wandert die Sonnenscheibe jetzt tatsächlich langsam um das Cutout – die separate Ecke-Sonne ist entfernt
+- **Kein Auswahl-Bildschirm mehr**: Die App startet automatisch (kurzer Ladebildschirm mit „Startet …“). Der „Einkaufsliste öffnen“-Knopf erscheint nur noch als Rückfall, falls der automatische Start nicht klappt; der Berichts-Knopf ist vom Startbildschirm entfernt (Erreichbar über Einstellungen; der Watchdog teilt im Notfall automatisch)
+
 ## v2.1.0 – 2026-11-19
 
 Neu: Konfetti-Burst für erledigte Aufgaben.

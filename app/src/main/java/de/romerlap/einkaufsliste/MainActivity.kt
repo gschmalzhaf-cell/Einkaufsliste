@@ -20,19 +20,22 @@ class MainActivity : ComponentActivity() {
         // blockiert auf Android 17 das komplette Fenster).
         val loadingScreen = buildLoadingScreen()
         setContentView(loadingScreen)
-        ReportLog.info("Startup", "Ladebildschirm gesetzt (mit Öffnen-Knopf)")
+        ReportLog.info("Startup", "Ladebildschirm gesetzt")
 
-        // Compose startet NUR per Nutzertipp (Auf Android 17 startet die Komposition
-        // bei zeitgesteuertem Start nachweislich nie). Der Knopf wird aktiviert,
-        // sobald die Datenbank vorgewärmt ist.
         val openButton = loadingScreen.findViewWithTag<android.widget.Button>("open")
         Thread {
             (application as EinkaufslisteApp).dbReady.await()
             ReportLog.info("Startup", "DB vorgewärmt (dbReady)")
             runOnUiThread {
-                openButton.isEnabled = true
-                openButton.text = "Einkaufsliste öffnen"
-                ReportLog.info("Startup", "Öffnen-Knopf aktiviert")
+                // Automatischer Start, sobald die DB bereit ist (Compose ohne Surface-Wurzel)
+                loadingScreen.postDelayed({ startComposeUi() }, 600)
+                // Rueckfall: erscheint der Start nicht, bietet sich der Knopf an
+                loadingScreen.postDelayed({
+                    if (!composeStarted.get()) {
+                        openButton.visibility = android.view.View.VISIBLE
+                        ReportLog.info("Startup", "Rückfall-Knopf sichtbar")
+                    }
+                }, 3200)
             }
         }.start()
         armWatchdog()
@@ -92,12 +95,12 @@ class MainActivity : ComponentActivity() {
 
     private val composeStarted = java.util.concurrent.atomic.AtomicBoolean(false)
 
-    /** Minimaler Ladebildschirm im Comic-Look (ohne Compose) mit Berichts-Knopf. */
+    /** Minimaler Ladebildschirm im Saison-Look (ohne Compose, ohne Diagnose-Elemente). */
     private fun buildLoadingScreen(): android.widget.LinearLayout {
         val container = android.widget.LinearLayout(this)
         container.orientation = android.widget.LinearLayout.VERTICAL
         container.gravity = android.view.Gravity.CENTER
-        container.setBackgroundColor(android.graphics.Color.rgb(0xFF, 0xF6, 0xE5))
+        container.setBackgroundColor(android.graphics.Color.rgb(0xF2, 0xF5, 0xFA))
         container.layoutParams = android.view.ViewGroup.LayoutParams(
             android.view.ViewGroup.LayoutParams.MATCH_PARENT,
             android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -108,35 +111,34 @@ class MainActivity : ComponentActivity() {
         text.text = "EINKAUFSLISTE"
         text.textSize = 28f
         text.gravity = android.view.Gravity.CENTER
-        text.setTextColor(android.graphics.Color.rgb(0xD6, 0x28, 0x28))
-        text.setOnClickListener { startComposeUi() }
+        text.setTextColor(android.graphics.Color.rgb(0x5B, 0x7F, 0xB5))
         container.addView(text)
 
         val hint = android.widget.TextView(this)
         hint.text = "Startet …"
         hint.textSize = 14f
         hint.gravity = android.view.Gravity.CENTER
-        hint.setPadding(0, 16, 0, 48)
-        hint.setTextColor(android.graphics.Color.rgb(0x4A, 0x44, 0x3A))
+        hint.setPadding(0, 16, 0, 0)
+        hint.setTextColor(android.graphics.Color.rgb(0x71, 0x80, 0x9B))
         container.addView(hint)
 
+        // Rueckfall-Knopf: unsichtbar, bis der automatische Start nicht klappen sollte
         val openButton = android.widget.Button(this)
         openButton.tag = "open"
-        openButton.text = "Datenbank wird geladen …"
-        openButton.textSize = 18f
+        openButton.text = "Einkaufsliste öffnen"
+        openButton.textSize = 16f
         openButton.setTextColor(android.graphics.Color.WHITE)
-        openButton.setBackgroundColor(android.graphics.Color.rgb(0xD6, 0x28, 0x28))
-        openButton.isEnabled = false
+        openButton.setBackgroundColor(android.graphics.Color.rgb(0x5B, 0x7F, 0xB5))
+        openButton.visibility = android.view.View.GONE
         openButton.setOnClickListener { startComposeUi() }
+        val params = android.widget.LinearLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.topMargin = 48
+        openButton.layoutParams = params
         container.addView(openButton)
-
-        val reportButton = android.widget.Button(this)
-        reportButton.text = "Diagnose-Bericht teilen"
-        reportButton.textSize = 13f
-        reportButton.setTextColor(android.graphics.Color.rgb(0x1D, 0x1D, 0x1B))
-        reportButton.setBackgroundColor(android.graphics.Color.rgb(0xFF, 0xC8, 0x00))
-        reportButton.setOnClickListener { shareReportNow() }
-        container.addView(reportButton)
         return container
+    }
     }
 }
