@@ -5,6 +5,7 @@ Eine einfache, private Android-Einkaufsliste für ein Gerät. Einträge können 
 - **Manuell** – Artikel und optionale Menge/Hinweis eintippen
 - **Per Foto** – Liste oder Notiz abfotografieren; mit Mistral-API-Schlüssel erkennt die KI Artikel mit Menge, sonst on-device per ML Kit
 - **Aus Rezept** – Rezepttext oder Rezept-Link einfügen; die App liest bevorzugt die strukturierten Rezeptdaten der Seite (Schema.org/JSON-LD) mit exakten Mengenangaben
+- **Start**: Auf Android 17 öffnet die App mit einem Startbildschirm; tippe auf „Einkaufsliste öffnen“ (nach kurzer DB-Vorwärmung aktiviert), alles andere startet direkt
 - **Diagnose-Bericht**: In-App-Ereignisprotokoll und Absturzaufzeichnung; Bericht als Markdown kopierbar/teilbar (Einstellungen → Diagnose-Bericht)
 - **Design-System**: Grafische Änderungen werden zuerst im Design entworfen – verbindliche Quelle ist [`design/design-system.md`](design/design-system.md) mit importierbaren SVG-Screens (Pixso/Figma) unter `design/screens/`
 - **Tags (optional)** – Einträge lassen sich mit einem Tag versehen (z. B. „Grillabend“); über die Tag-Chips lassen sie sich priorisieren sowie ein- und ausblenden

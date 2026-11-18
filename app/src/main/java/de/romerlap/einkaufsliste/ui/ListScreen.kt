@@ -67,19 +67,8 @@ import de.romerlap.einkaufsliste.ui.theme.comicSticker
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(viewModel: ListViewModel) {
-    val diagLogged = remember { mutableStateOf(setOf<String>()) }
-    fun logOnce(msg: String) {
-        if (msg !in diagLogged.value) {
-            diagLogged.value = diagLogged.value + msg
-            ReportLog.info("ListScreen", msg)
-        }
-    }
-    logOnce("1 Komposition betreten")
-
     val items by viewModel.items.collectAsState()
     val allTags = items.mapNotNull { it.tag }.distinct().sorted()
-    logOnce("2 Items-Status abgerufen (${items.size})")
-    logOnce("3 vor Scaffold")
     var showAddSheet by rememberSaveable { mutableStateOf(false) }
     var showManualDialog by rememberSaveable { mutableStateOf(false) }
     var showRecipeSheet by rememberSaveable { mutableStateOf(false) }
@@ -224,7 +213,6 @@ fun ListScreen(viewModel: ListViewModel) {
             }
         }
     }
-    logOnce("4 Scaffold-Content abgeschlossen")
 
     if (showAddSheet) {
         ModalBottomSheet(onDismissRequest = { showAddSheet = false }) {

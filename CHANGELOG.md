@@ -3,6 +3,19 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.34 – 2026-11-18
+
+Final: Weißer-Bildschirm-Problem vollständig behoben – Diagnose-Marken entfernt, Fixes bleiben.
+
+### Bereinigt
+- Kompositions-Marken (ListScreen), DB-Baulog und Start-Detailllogs aus der Diagnose-Phase entfernt – das Ereignisprotokoll bleibt schlank und auf Fehler und wichtige Ereignisse konzentriert
+
+### Bleiben als dauerhafte Errungenschaften dieser Jagd
+- **Fix**: Komposition ohne `Surface`-Wurzel (Exakt der auf dem Gerät bewiesene Aufrufbaum `EinkaufslisteTheme → viewModel → EinkaufslisteApp`) – `Surface(fillMaxSize)` an der Wurzel blockiert auf Android 17 die Komposition
+- **Fix**: DB-Vorwärmung im Hintergrund ab App-Start; Öffnen-Knopf aktiviert sich nach Vorwärmung
+- **Android-17-Schrift-Fallback**: Standard-Schrift auf API 37+ (Comic-Schriften bleiben auf älteren Versionen)
+- **Diagnose-Bericht**: persistentes Ereignisprotokoll, Absturzaufzeichnung, Berichts-Knopf auf dem Startbildschirm, Watchdog (teilt bei hängendem Start automatisch), Bericht über Einstellungen teilbar/kopierbar
+
 ## v1.33 – 2026-11-18
 
 Behoben: Surface-Wurzel blockiert auf Android 17 die Komposition – exakt bewiesener v1.25-Aufrufbaum wiederhergestellt.
