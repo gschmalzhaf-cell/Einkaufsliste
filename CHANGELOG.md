@@ -3,6 +3,14 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.26.1 – 2026-11-18
+
+Nachbesserung: Weißer Bildschirm – erneutes Auftreten behoben (Race Condition).
+
+### Behoben
+- **Race Condition beim Start**: In v1.26 startete Compose sofort und griff auf die Datenbank zu, bevor die Hintergrund-Vorwärmung fertig war – auf Android 17 blockierte der Haupt-Thread erneut (weißer Bildschirm). In v1.25 funktionierte es nur, weil der Diagnose-Bildschirm der Vorwärmung Zeit gab
+- **Fix**: Die App zeigt einen kurzen Ladebildschirm („EINKAUFSLISTE") und startet Compose erst, wenn die Datenbank bereit ist (max. 3 Sekunden Warteschutz). Der Haupt-Thread erreicht die Datenbank-Erstellung nie mehr selbst
+
 ## v1.26 – 2026-11-18
 
 Behoben: Weißer Bildschirm auf Android 17 (Pixel 9 Pro) – finaler Fix und Bereinigung.

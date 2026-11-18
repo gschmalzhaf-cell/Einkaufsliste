@@ -5,6 +5,9 @@ import android.app.Application
 /** Application-Klasse: registriert Absturz-Protokollierung und Start-Ereignis. */
 class EinkaufslisteApp : Application() {
 
+    /** Signalisiert, dass die Datenbank im Hintergrund vorgewaermt ist. */
+    val dbReady = java.util.concurrent.CountDownLatch(1)
+
     override fun onCreate() {
         super.onCreate()
         try {
@@ -26,6 +29,8 @@ class EinkaufslisteApp : Application() {
                     ReportLog.info("App", "Datenbank vorgewärmt")
                 } catch (e: Exception) {
                     ReportLog.error("App", "DB-Vorwärmung: ${e.javaClass.simpleName}: ${e.message}")
+                } finally {
+                    dbReady.countDown()
                 }
             }.start()
         } catch (e: Exception) {
