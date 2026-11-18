@@ -3,6 +3,13 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.24 – 2026-11-18
+
+Diagnose-Build: Bericht liest das persistente Protokoll.
+
+### Behoben
+- **Berichtserstellung korrigiert**: Der Diagnose-Bericht liest jetzt das dauerhaft gespeicherte Ereignisprotokoll statt des flüchtigen Arbeitsspeichers – die Kompositions-Marken und Stufen-Starts aus früheren Sitzungen erscheinen damit im Bericht (v1.23 speicherte sie already, aber zeigte sie nicht)
+
 ## v1.23 – 2026-11-18
 
 Diagnose-Build: Ereignisprotokoll persistent machen.

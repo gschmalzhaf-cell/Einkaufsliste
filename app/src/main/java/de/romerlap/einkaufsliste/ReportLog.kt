@@ -119,8 +119,15 @@ object ReportLog {
             appendLine("## Letzter Absturz")
             appendLine(lastCrash(context) ?: "Keiner seit der letzten Installation bekannt.")
             appendLine()
-            appendLine("## Ereignisprotokoll (max. $MAX_ENTRIES, neueste zuletzt)")
-            val log = snapshot()
+            appendLine("## Ereignisprotokoll (persistent, max. $MAX_ENTRIES, neueste zuletzt)")
+            val log = try {
+                prefs(context).getString("event_log", null)
+                    ?.split("\n")
+                    ?.filter { it.isNotBlank() }
+                    ?: snapshot()
+            } catch (_: Exception) {
+                snapshot()
+            }
             if (log.isEmpty()) {
                 appendLine("(leer)")
             } else {
