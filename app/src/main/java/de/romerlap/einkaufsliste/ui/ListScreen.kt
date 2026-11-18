@@ -142,8 +142,8 @@ fun ListScreen(viewModel: ListViewModel) {
                         Icon(Icons.Filled.Settings, contentDescription = "Einstellungen")
                     }
                 }
-                logOnce("4 TopAppBar komponiert")
             )
+            logOnce("4 TopAppBar komponiert")
         },
         floatingActionButton = {
             logOnce("8 FAB wird komponiert")
