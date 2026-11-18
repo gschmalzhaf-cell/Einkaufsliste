@@ -3,6 +3,22 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v2.3.0 – 2026-11-19
+
+Neu: Einträge bearbeiten, Cozy-Seasons-App-Icon, sichtbare Mistral-KI-Persistenz & Design-Feinschliff.
+
+### Neu & Verbessert
+- **Einträge nachträglich anpassen**: Ein Tipp auf eine Karte (oder auf das neue Stift-Symbol) öffnet den Bearbeiten-Dialog. Artikelname, Menge/Hinweis, Tag und die handelsübliche Packungsgröße können jederzeit angepasst oder per KI neu recherchiert werden
+- **Cozy-Seasons-App-Icon**: Das Adaptive Icon (Hintergrund, Vordergrund, Monochrome sowie `design/v2/screens/app-icon.svg`) passt jetzt zum neuen Cozy-Seasons-Design – weiche weiße Karte mit sanftem Schatten, runden Checkbox-Kreisen, kleiner FAB-Pille und den vier Jahreszeiten-Akzenten (Blüte, Sonne, Blatt, Schneeflocke) statt hartem V1-Comic-Sticker
+- **Mistral-API-Schlüssel dauerhaft & sichtbar**:
+  - Synchrones Speichern (`commit()`) mit automatischer Selbstreparatur + Fallback-Store, falls `EncryptedSharedPreferences`/Android-Keystore auf dem Gerät hakt
+  - Reaktiver Status ohne App-Neustart: Im Kopf erscheint ein **„✨ KI aktiv“**-Badge, in den Einstellungen steht **„Hinterlegt ✓“** samt maskierter Vorschau (`xxxx••••yyyy`), und im Schlüssel-Dialog gibt es ein grünes Bestätigungs-Banner sowie ein Auge-Symbol zum Ein-/Ausblenden
+- **Cozy-Saison-Design verfeinert**:
+  - Weicher Himmels-Verlauf (`sky`) im oberen Bildschirm-Drittel und jahreszeitenspezifischer Kranz um das Kamera-Loch (Blütenreigen, wandernde Sonne, Herbstpunkte, Schneeglitzer)
+  - Handgezeichnet wirkende Partikel: echte Herbstblätter mit Mittelrippe, ovale Blütenblätter mit Lichtpunkt, Schneekristalle mit Strahlen und pulsierender Sonnenstaub
+  - Tippbare Saison-Pille mit Emoji & Stimmungstext (ein Tipp wechselt mit weichem 550-ms-Farb-Crossfade durch Frühling, Sommer, Herbst und Winter)
+  - Illustrierte Cozy-Willkommenskarte bei leerer Liste und harmonisch eingefärbter Start-/Ladebildschirm
+
 ## v2.2.0 – 2026-11-19
 
 Behoben: Kopfzeilen-Texte, Notch-Ausrichtung und „Debug-Modus“ beim Start.

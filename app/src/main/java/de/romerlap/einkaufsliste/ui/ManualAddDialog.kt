@@ -31,12 +31,14 @@ import kotlinx.coroutines.launch
 fun ManualAddDialog(
     onDismiss: () -> Unit,
     onConfirm: (name: String, detail: String?, retailHint: String?, tag: String?) -> Unit,
-    existingTags: List<String> = emptyList()
+    existingTags: List<String> = emptyList(),
+    initialItem: de.romerlap.einkaufsliste.data.ShoppingItem? = null
 ) {
-    var name by rememberSaveable { mutableStateOf("") }
-    var detail by rememberSaveable { mutableStateOf("") }
-    var tag by rememberSaveable { mutableStateOf("") }
-    var aiHint by rememberSaveable { mutableStateOf("") }
+    val isEdit = initialItem != null
+    var name by rememberSaveable(initialItem?.id) { mutableStateOf(initialItem?.name.orEmpty()) }
+    var detail by rememberSaveable(initialItem?.id) { mutableStateOf(initialItem?.detail.orEmpty()) }
+    var tag by rememberSaveable(initialItem?.id) { mutableStateOf(initialItem?.tag.orEmpty()) }
+    var aiHint by rememberSaveable(initialItem?.id) { mutableStateOf(initialItem?.retailHint.orEmpty()) }
     var researching by rememberSaveable { mutableStateOf(false) }
     var researchFailed by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
@@ -47,7 +49,7 @@ fun ManualAddDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Eintrag hinzufügen") },
+        title = { Text(if (isEdit) "Eintrag bearbeiten" else "Eintrag hinzufügen") },
         text = {
             Column {
                 OutlinedTextField(
@@ -72,12 +74,22 @@ fun ManualAddDialog(
                     existingTags = existingTags,
                     modifier = Modifier.padding(top = 8.dp)
                 )
-                if (shownHint != null) {
+                OutlinedTextField(
+                    value = aiHint,
+                    onValueChange = { aiHint = it },
+                    label = { Text("Packungsgröße / Handelsüblich (optional)") },
+                    placeholder = { if (catalogHint != null) Text("Vorschlag: $catalogHint") },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                )
+                if (shownHint != null && aiHint.isBlank()) {
                     Text(
                         "Handelsüblich (Rewe/Aldi): $shownHint",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 6.dp)
                     )
                 }
                 if (hasKey && name.isNotBlank()) {
@@ -126,10 +138,11 @@ fun ManualAddDialog(
             TextButton(
                 onClick = { onConfirm(name, detail.ifBlank { null }, shownHint, tag.ifBlank { null }) },
                 enabled = name.isNotBlank()
-            ) { Text("Hinzufügen") }
+            ) { Text(if (isEdit) "Speichern" else "Hinzufügen") }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Abbrechen") }
         }
     )
 }
+

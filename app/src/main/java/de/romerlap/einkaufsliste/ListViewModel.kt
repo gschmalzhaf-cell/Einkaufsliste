@@ -41,6 +41,21 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch { dao.update(item.copy(isChecked = !item.isChecked)) }
     }
 
+    fun update(item: ShoppingItem, name: String, detail: String? = null, retailHint: String? = null, tag: String? = null) {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty()) return
+        viewModelScope.launch {
+            dao.update(
+                item.copy(
+                    name = trimmed,
+                    detail = detail?.trim()?.ifEmpty { null },
+                    retailHint = retailHint?.trim()?.ifEmpty { null },
+                    tag = tag?.trim()?.ifEmpty { null }
+                )
+            )
+        }
+    }
+
     fun delete(item: ShoppingItem) {
         viewModelScope.launch { dao.delete(item) }
     }

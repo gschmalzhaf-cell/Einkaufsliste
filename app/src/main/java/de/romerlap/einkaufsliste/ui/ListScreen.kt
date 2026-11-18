@@ -386,12 +386,14 @@ private fun SectionHeader(title: String) {
 private fun ItemRow(
     item: ShoppingItem,
     onToggle: () -> Unit,
+    onEdit: () -> Unit = {},
     onDelete: () -> Unit
 ) {
     ComicCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clickable { onEdit() }
     ) {
         Row(
             modifier = Modifier
@@ -437,6 +439,9 @@ private fun ItemRow(
                 )
             }
         }
+            IconButton(onClick = onEdit) {
+                Icon(Icons.Filled.Edit, contentDescription = "Bearbeiten")
+            }
             IconButton(onClick = onDelete) {
                 Icon(Icons.Filled.Delete, contentDescription = "Löschen")
             }

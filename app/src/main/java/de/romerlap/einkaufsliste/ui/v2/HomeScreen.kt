@@ -10,6 +10,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,8 +24,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -32,6 +35,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
@@ -41,6 +45,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -61,14 +66,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.romerlap.einkaufsliste.ApiKeyStore
@@ -83,14 +94,16 @@ import de.romerlap.einkaufsliste.ui.ReportDialog
 import de.romerlap.einkaufsliste.ui.SettingsSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.math.cos
 import kotlin.math.sin
 
 /**
  * V2-Hauptbildschirm: Cozy Seasons.
- * - Saisonale Palette automatisch per Datum (SeasonEngine)
- * - Motion-Layer mit Saison-Partikeln hinter dem Inhalt
+ * - Saisonale Palette automatisch per Datum (SeasonEngine) + Tipp-Wechsler zum Stöbern
+ * - Weiches Himmels-Band im oberen Drittel + Motion-Layer mit Saison-Partikeln
  * - Kamera-Loch als saisonaler Anker (pulsierender Ring um das Cutout)
- * - Feder-Physik beim Abhaken, sofort filternde Chips, Cozy-Karten
+ * - Einträge per Tipp auf Karte oder Stift-Icon bearbeitbar
+ * - Sichtbares KI-Badge + zuverlässige Persistenz des Mistral-API-Schlüssels
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,6 +116,7 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
     var untaggedSelected by rememberSaveable { mutableStateOf(false) }
     var showAddSheet by rememberSaveable { mutableStateOf(false) }
     var showManualDialog by rememberSaveable { mutableStateOf(false) }
+    var editingItem by remember { mutableStateOf<ShoppingItem?>(null) }
     var showRecipeSheet by rememberSaveable { mutableStateOf(false) }
     var showSettings by rememberSaveable { mutableStateOf(false) }
     var showKeyDialog by rememberSaveable { mutableStateOf(false) }
@@ -110,7 +124,7 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
     var photoResult by remember { mutableStateOf<Bitmap?>(null) }
 
     val context = LocalContext.current
-    var currentKey by remember { mutableStateOf<String?>(null) }
+    var currentKey by remember { mutableStateOf<String?>(ApiKeyStore.get(context)) }
     LaunchedEffect(Unit) {
         currentKey = withContext(Dispatchers.IO) { ApiKeyStore.get(context) }
     }
@@ -145,6 +159,22 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
     var burstTick by remember { mutableStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize().background(season.background)) {
+        // Saisonaler Himmels-Verlauf im oberen Drittel (wie in den V2-Design-Screens)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(310.dp)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            season.sky.copy(alpha = 0.92f),
+                            season.sky.copy(alpha = 0.45f),
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
+
         // Motion-Layer: Saison-Partikel hinter allem
         ParticleLayer(modifier = Modifier.fillMaxSize())
         if (burstTick > 0) {
@@ -152,26 +182,56 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
         }
 
         // Notch-Anker: Ring exakt im Statusleisten-Band (Cutout-Position,
-        // Pixel 9 Pro: mittig). Sommer: die Sonne wandert um das Loch.
+        // Pixel 9 Pro: mittig). Je nach Saison mit individuellem Kranz.
         val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
         Canvas(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .height(topInset + 6.dp)
+                .height(topInset + 10.dp)
         ) {
             val cx = size.width / 2f
             val cy = (topInset.toPx()) / 2f
-            val pulse = 26f + sin(System.nanoTime() / 800_000_000.0).toFloat() * 2.5f
+            val t = System.nanoTime() / 1_000_000_000.0
+            val pulse = 26f + sin(t * 1.4).toFloat() * 2.5f
             drawCircle(season.primary, pulse, center = Offset(cx, cy), alpha = 0.55f)
             drawCircle(season.primary, pulse + 8f, center = Offset(cx, cy), alpha = 0.18f)
-            if (season.season.particle == Season.ParticleKind.SUN) {
-                // Sonne wandert langsam um das Kamera-Loch
-                val a = System.nanoTime() / 12_000_000_000.0
-                val sx = cx + (kotlin.math.cos(a) * 74f).toFloat()
-                val sy = cy + (kotlin.math.sin(a) * 30f).toFloat()
-                drawCircle(Color(0xFFF5D77A), 13f, center = Offset(sx, sy), alpha = 0.95f)
-                drawCircle(Color(0xFFF2A93B), 26f, center = Offset(sx, sy), alpha = 0.20f)
+            when (season.season.particle) {
+                Season.ParticleKind.SUN -> {
+                    // Sonne wandert langsam um das Kamera-Loch
+                    val a = t / 10.0
+                    val sx = cx + (cos(a) * 74f).toFloat()
+                    val sy = cy + (sin(a) * 28f).toFloat()
+                    drawCircle(Color(0xFFF5D77A), 13f, center = Offset(sx, sy), alpha = 0.95f)
+                    drawCircle(Color(0xFFF2A93B), 24f, center = Offset(sx, sy), alpha = 0.22f)
+                }
+                Season.ParticleKind.PETAL -> {
+                    // Sanfter Blütenreigen um das Loch
+                    for (i in 0 until 6) {
+                        val a = t * 0.4 + i * (Math.PI / 3.0)
+                        val px = cx + (cos(a) * (pulse + 7f)).toFloat()
+                        val py = cy + (sin(a) * (pulse + 7f)).toFloat()
+                        drawCircle(season.deco, 4.5f, center = Offset(px, py), alpha = 0.85f)
+                    }
+                }
+                Season.ParticleKind.LEAF -> {
+                    // Warme Herbstpunkte kreisen langsam
+                    for (i in 0 until 4) {
+                        val a = t * 0.35 + i * (Math.PI / 2.0)
+                        val px = cx + (cos(a) * (pulse + 8f)).toFloat()
+                        val py = cy + (sin(a) * (pulse + 6f)).toFloat()
+                        drawCircle(season.secondary, 4f, center = Offset(px, py), alpha = 0.7f)
+                    }
+                }
+                Season.ParticleKind.SNOW -> {
+                    // Glitzernde Schneepunkte am Rand
+                    for (i in 0 until 6) {
+                        val a = i * (Math.PI / 3.0) + sin(t * 0.6 + i) * 0.15
+                        val px = cx + (cos(a) * (pulse + 6f)).toFloat()
+                        val py = cy + (sin(a) * (pulse + 6f)).toFloat()
+                        drawCircle(Color.White, 3.5f, center = Offset(px, py), alpha = 0.9f)
+                    }
+                }
             }
         }
 
@@ -180,12 +240,12 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                 .fillMaxSize()
                 .padding(WindowInsets.systemBars.asPaddingValues())
         ) {
-            // ---- Kopf: Titel + Saison + Aktionen (keine Ueberlappung) ----
+            // ---- Kopf: Titel + Saison-Pille + KI-Status + Aktionen ----
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 24.dp, end = 8.dp, top = 8.dp)
+                    .padding(start = 24.dp, end = 12.dp, top = 8.dp, bottom = 4.dp)
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -193,11 +253,66 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                         style = MaterialTheme.typography.headlineLarge,
                         color = season.primary
                     )
-                    Text(
-                        season.season.label,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = season.soft
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
+                        // Tippbare Saison-Pille: zeigt Jahreszeit & Stimmung, wechselt bei Tipp die Saison-Vorschau
+                        Surface(
+                            shape = CircleShape,
+                            color = season.surface.copy(alpha = 0.75f),
+                            shadowElevation = 1.dp,
+                            modifier = Modifier.clickable { season.onCycleSeason() }
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
+                            ) {
+                                Text(
+                                    "${season.season.emoji} ${season.season.label.uppercase()}",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        letterSpacing = 1.2.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = season.primary
+                                )
+                                Text(
+                                    " · ${season.season.mood}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = season.soft
+                                )
+                            }
+                        }
+                    }
+                }
+                // Sichtbares KI-Status-Badge: zeigt sofort, dass der Mistral-Schlüssel aktiv hinterlegt ist
+                if (currentKey != null) {
+                    Surface(
+                        shape = CircleShape,
+                        color = season.secondary.copy(alpha = 0.16f),
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .clickable { showKeyDialog = true }
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.AutoAwesome,
+                                contentDescription = "Mistral KI aktiv",
+                                tint = season.secondary,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                "KI aktiv",
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                color = season.secondary
+                            )
+                        }
+                    }
                 }
                 if (items.any { it.isChecked }) {
                     IconButton(onClick = {
@@ -212,8 +327,14 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                 }
             }
 
-            // ---- Chips (filtern sofort) ----
+            // ---- Chips (im Cozy-Look: weiß / Saison-Primary, filtern sofort) ----
             if (allTags.isNotEmpty()) {
+                val chipColors = FilterChipDefaults.filterChipColors(
+                    containerColor = season.surface.copy(alpha = 0.9f),
+                    labelColor = season.ink,
+                    selectedContainerColor = season.primary,
+                    selectedLabelColor = Color.White
+                )
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
@@ -225,8 +346,10 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                                 selectedTags = emptyList()
                                 untaggedSelected = false
                             },
-                            label = { Text("Alle") },
-                            shape = CircleShape
+                            label = { Text("Alle (${items.size})") },
+                            shape = CircleShape,
+                            colors = chipColors,
+                            border = null
                         )
                     }
                     item {
@@ -234,7 +357,9 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                             selected = untaggedSelected,
                             onClick = { untaggedSelected = !untaggedSelected },
                             label = { Text("Ohne Tag") },
-                            shape = CircleShape
+                            shape = CircleShape,
+                            colors = chipColors,
+                            border = null
                         )
                     }
                     items(allTags) { tag ->
@@ -243,8 +368,10 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                             onClick = {
                                 selectedTags = if (tag in selectedTags) selectedTags - tag else selectedTags + tag
                             },
-                            label = { Text(tag) },
-                            shape = CircleShape
+                            label = { Text("#$tag") },
+                            shape = CircleShape,
+                            colors = chipColors,
+                            border = null
                         )
                     }
                 }
@@ -258,16 +385,15 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
             ) {
                 if (visible.isEmpty()) {
                     item {
-                        Text(
-                            "Noch nichts auf der Liste.\nTippe unten auf „Hinzufügen“.",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = season.soft,
-                            modifier = Modifier.padding(24.dp)
+                        CozyEmptyCard(
+                            season = season,
+                            hasItemsAtAll = items.isNotEmpty(),
+                            onAddClick = { showAddSheet = true }
                         )
                     }
                 }
                 if (open.isNotEmpty()) {
-                    item { SectionPill("Offen", season.secondary) }
+                    item { SectionPill("Offen", open.size, season.secondary) }
                     items(open, key = { it.id }) { item ->
                         CozyCard(
                             item = item,
@@ -276,17 +402,24 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                                 if (open.size == 1) burstTick++ // letzter offener Artikel: Liste geschafft!
                                 viewModel.toggle(item)
                             },
+                            onEdit = { editingItem = item },
                             onDelete = { viewModel.delete(item) }
                         )
                     }
                 }
                 if (done.isNotEmpty()) {
-                    item { SectionPill("Erledigt", season.primary) }
+                    item { SectionPill("Erledigt", done.size, season.primary) }
                     items(done, key = { it.id }) { item ->
-                        CozyCard(item = item, season = season, onToggle = { viewModel.toggle(item) }, onDelete = { viewModel.delete(item) })
+                        CozyCard(
+                            item = item,
+                            season = season,
+                            onToggle = { viewModel.toggle(item) },
+                            onEdit = { editingItem = item },
+                            onDelete = { viewModel.delete(item) }
+                        )
                     }
                 }
-                item { Spacer(modifier = Modifier.height(96.dp)) }
+                item { Spacer(modifier = Modifier.height(104.dp)) }
             }
         }
 
@@ -301,7 +434,7 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 28.dp)
-                .shadow(6.dp, RoundedCornerShape(28.dp))
+                .shadow(8.dp, RoundedCornerShape(28.dp))
         )
     }
 
@@ -314,8 +447,18 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
             AddOption(Icons.Filled.Edit, "Manuell", "Eintrag selbst tippen") { showManualDialog = true; showAddSheet = false }
-            AddOption(Icons.Filled.PhotoCamera, "Per Foto", "Artikel abfotografieren") { showAddSheet = false; startPhotoCapture() }
-            AddOption(Icons.Filled.ReceiptLong, "Rezept oder Link", "Zutaten automatisch erkennen") { showRecipeSheet = true; showAddSheet = false }
+            AddOption(
+                Icons.Filled.PhotoCamera,
+                "Per Foto",
+                if (currentKey != null) "Abfotografieren – Mistral-KI erkennt Artikel & Menge"
+                else "Artikel oder Einkaufszettel abfotografieren"
+            ) { showAddSheet = false; startPhotoCapture() }
+            AddOption(
+                Icons.Filled.ReceiptLong,
+                "Rezept oder Link",
+                if (currentKey != null) "Zutaten & Packungsgrößen per Mistral-KI erkennen"
+                else "Zutaten automatisch aus Rezept erkennen"
+            ) { showRecipeSheet = true; showAddSheet = false }
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
@@ -325,6 +468,17 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
             onConfirm = { name, detail, retailHint, tag ->
                 viewModel.add(name, detail, retailHint, tag)
                 showManualDialog = false
+            },
+            existingTags = allTags
+        )
+    }
+    editingItem?.let { itemToEdit ->
+        ManualAddDialog(
+            initialItem = itemToEdit,
+            onDismiss = { editingItem = null },
+            onConfirm = { name, detail, retailHint, tag ->
+                viewModel.update(itemToEdit, name, detail, retailHint, tag)
+                editingItem = null
             },
             existingTags = allTags
         )
@@ -352,13 +506,14 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
     }
     if (showSettings) {
         SettingsSheet(
+            currentKey = currentKey,
             onDismiss = { showSettings = false },
             onOpenApiKey = { showKeyDialog = true; showSettings = false },
             onOpenReport = { showReport = true; showSettings = false }
         )
     }
     if (showReport) {
-        val report = remember(items) {
+        val report = remember(items, currentKey) {
             ReportLog.generate(
                 context = context,
                 openCount = items.count { !it.isChecked },
@@ -375,9 +530,59 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
             onDismiss = { showKeyDialog = false },
             onSave = { key ->
                 ApiKeyStore.set(context, key)
+                currentKey = ApiKeyStore.get(context)
                 showKeyDialog = false
             }
         )
+    }
+}
+
+/**
+ * Cozy-Leerzustand als illustrierte Willkommens-Karte im Jahreszeiten-Stil.
+ */
+@Composable
+private fun CozyEmptyCard(
+    season: SeasonColors,
+    hasItemsAtAll: Boolean,
+    onAddClick: () -> Unit
+) {
+    Surface(
+        shape = RoundedCornerShape(28.dp),
+        color = season.surface.copy(alpha = 0.92f),
+        shadowElevation = 2.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 16.dp)
+            .clickable { onAddClick() }
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 28.dp)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(56.dp)
+                    .background(season.primary.copy(alpha = 0.14f), CircleShape)
+            ) {
+                Text(season.season.emoji, fontSize = 28.sp)
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                if (hasItemsAtAll) "Keine Einträge für diesen Filter"
+                else season.season.label + "s-Liste",
+                style = MaterialTheme.typography.titleMedium,
+                color = season.ink
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                if (hasItemsAtAll) "Wähle oben „Alle“, um wieder alle Artikel zu sehen."
+                else season.season.emptyHint,
+                style = MaterialTheme.typography.bodyMedium,
+                color = season.soft,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
@@ -444,99 +649,169 @@ private fun AddOption(icon: ImageVector, title: String, sub: String, onClick: ()
 }
 
 @Composable
-private fun SectionPill(title: String, color: Color) {
-    Text(
-        title,
-        style = MaterialTheme.typography.titleMedium,
-        color = color,
+private fun SectionPill(title: String, count: Int, color: Color) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(top = 8.dp)
-            .background(color.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
-            .padding(horizontal = 14.dp, vertical = 4.dp)
-    )
+            .padding(top = 6.dp, start = 4.dp)
+            .background(color.copy(alpha = 0.14f), RoundedCornerShape(14.dp))
+            .padding(horizontal = 14.dp, vertical = 5.dp)
+    ) {
+        Text(
+            title,
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+            color = color
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            count.toString(),
+            style = MaterialTheme.typography.labelMedium,
+            color = color.copy(alpha = 0.8f)
+        )
+    }
 }
 
-/** Cozy-Karte: weiche runde Form, Feder-Physik beim Abhaken. */
+/**
+ * Cozy-Karte: weiche runde Form (Radius 26 dp), Feder-Physik beim Abhaken,
+ * und per Tipp auf die Karte oder das Stift-Symbol direkt bearbeitbar.
+ */
 @Composable
 private fun CozyCard(
     item: ShoppingItem,
     season: SeasonColors,
     onToggle: () -> Unit,
+    onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
     val scale by animateFloatAsState(
-        targetValue = if (item.isChecked) 0.97f else 1f,
+        targetValue = if (item.isChecked) 0.98f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
         label = "cardScale"
     )
     Surface(
         shape = RoundedCornerShape(26.dp),
-        color = season.surface,
-        shadowElevation = 3.dp,
+        color = if (item.isChecked) season.surface.copy(alpha = 0.78f) else season.surface,
+        shadowElevation = if (item.isChecked) 1.dp else 4.dp,
         modifier = Modifier
             .fillMaxWidth()
             .scale(scale)
+            .border(
+                width = 1.dp,
+                color = season.primary.copy(alpha = if (item.isChecked) 0.08f else 0.14f),
+                shape = RoundedCornerShape(26.dp)
+            )
+            .clickable { onEdit() }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)
         ) {
             val checkScale by animateFloatAsState(
-                targetValue = if (item.isChecked) 1.2f else 1f,
-                animationSpec = spring(dampingRatio = 0.35f),
+                targetValue = if (item.isChecked) 1.15f else 1f,
+                animationSpec = spring(dampingRatio = 0.4f),
                 label = "checkScale"
             )
+            // 28-dp Checkbox-Kreis entsprechend dem Cozy-Seasons-Design-System
             Box(
                 modifier = Modifier
+                    .size(32.dp)
                     .scale(checkScale)
                     .background(
-                        if (item.isChecked) season.primary.copy(alpha = 0.2f) else season.background,
+                        if (item.isChecked) season.primary.copy(alpha = 0.18f) else season.background,
                         CircleShape
+                    )
+                    .border(
+                        width = 2.dp,
+                        color = if (item.isChecked) season.primary else season.soft.copy(alpha = 0.45f),
+                        shape = CircleShape
                     )
                     .clickable { onToggle() },
                 contentAlignment = Alignment.Center
             ) {
-                Canvas(modifier = Modifier.height(20.dp).fillMaxWidth(0.2f)) {
-                    val r = size.height / 2f
-                    drawCircle(season.soft, r, center = Offset(size.width / 2f, size.height / 2f), alpha = 0.5f)
-                    if (item.isChecked) {
+                if (item.isChecked) {
+                    Canvas(modifier = Modifier.size(16.dp)) {
+                        val w = size.width
+                        val h = size.height
                         val p = Path().apply {
-                            moveTo(size.width / 2f - r * 0.45f, size.height / 2f)
-                            lineTo(size.width / 2f - r * 0.1f, size.height / 2f + r * 0.4f)
-                            lineTo(size.width / 2f + r * 0.5f, size.height / 2f - r * 0.5f)
+                            moveTo(w * 0.18f, h * 0.52f)
+                            lineTo(w * 0.43f, h * 0.76f)
+                            lineTo(w * 0.84f, h * 0.24f)
                         }
-                        drawPath(p, season.primary, style = Stroke(width = 4f))
+                        drawPath(
+                            p,
+                            color = season.primary,
+                            style = Stroke(width = 3.2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
+                        )
                     }
                 }
             }
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 6.dp)
+                    .padding(horizontal = 12.dp)
             ) {
-                Text(
-                    item.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (item.isChecked) season.soft else season.ink
-                )
-                if (item.detail != null || item.tag != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Text(
-                        listOfNotNull(item.tag?.let { "#$it" }, item.detail).joinToString(" · "),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = season.primary
+                        item.name,
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                        color = if (item.isChecked) season.soft else season.ink,
+                        textDecoration = if (item.isChecked) TextDecoration.LineThrough else null,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    if (item.tag != null) {
+                        Text(
+                            "#${item.tag}",
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            color = season.primary,
+                            modifier = Modifier
+                                .background(season.primary.copy(alpha = 0.12f), RoundedCornerShape(10.dp))
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+                if (item.detail != null) {
+                    Text(
+                        item.detail,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = season.soft,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
                 if (item.retailHint != null) {
                     Text(
                         "Handelsüblich: ${item.retailHint}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = season.soft
+                        color = season.soft.copy(alpha = 0.85f),
+                        modifier = Modifier.padding(top = 1.dp)
                     )
                 }
             }
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, contentDescription = "Löschen", tint = season.soft.copy(alpha = 0.6f))
+            IconButton(
+                onClick = onEdit,
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(
+                    Icons.Filled.Edit,
+                    contentDescription = "Bearbeiten",
+                    tint = season.soft.copy(alpha = 0.65f),
+                    modifier = Modifier.size(19.dp)
+                )
+            }
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(
+                    Icons.Filled.Delete,
+                    contentDescription = "Löschen",
+                    tint = season.soft.copy(alpha = 0.55f),
+                    modifier = Modifier.size(19.dp)
+                )
             }
         }
     }
 }
+

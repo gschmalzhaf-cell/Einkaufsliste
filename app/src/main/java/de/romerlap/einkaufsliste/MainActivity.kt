@@ -95,12 +95,13 @@ class MainActivity : ComponentActivity() {
 
     private val composeStarted = java.util.concurrent.atomic.AtomicBoolean(false)
 
-    /** Minimaler Ladebildschirm im Saison-Look (ohne Compose, ohne Diagnose-Elemente). */
+    /** Minimaler Ladebildschirm im aktiven Saison-Look (ohne Compose, ohne Diagnose-Elemente). */
     private fun buildLoadingScreen(): android.widget.LinearLayout {
+        val season = de.romerlap.einkaufsliste.ui.v2.Season.current()
         val container = android.widget.LinearLayout(this)
         container.orientation = android.widget.LinearLayout.VERTICAL
         container.gravity = android.view.Gravity.CENTER
-        container.setBackgroundColor(android.graphics.Color.rgb(0xF2, 0xF5, 0xFA))
+        container.setBackgroundColor(season.background.toInt())
         container.layoutParams = android.view.ViewGroup.LayoutParams(
             android.view.ViewGroup.LayoutParams.MATCH_PARENT,
             android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -108,18 +109,18 @@ class MainActivity : ComponentActivity() {
         container.setPadding(48, 96, 48, 96)
 
         val text = android.widget.TextView(this)
-        text.text = "EINKAUFSLISTE"
-        text.textSize = 28f
+        text.text = "${season.emoji} EINKAUFSLISTE"
+        text.textSize = 26f
         text.gravity = android.view.Gravity.CENTER
-        text.setTextColor(android.graphics.Color.rgb(0x5B, 0x7F, 0xB5))
+        text.setTextColor(season.primary.toInt())
         container.addView(text)
 
         val hint = android.widget.TextView(this)
-        hint.text = "Startet …"
+        hint.text = "${season.label} · ${season.mood}"
         hint.textSize = 14f
         hint.gravity = android.view.Gravity.CENTER
         hint.setPadding(0, 16, 0, 0)
-        hint.setTextColor(android.graphics.Color.rgb(0x71, 0x80, 0x9B))
+        hint.setTextColor(season.soft.toInt())
         container.addView(hint)
 
         // Rueckfall-Knopf: unsichtbar, bis der automatische Start nicht klappen sollte
@@ -128,7 +129,7 @@ class MainActivity : ComponentActivity() {
         openButton.text = "Einkaufsliste öffnen"
         openButton.textSize = 16f
         openButton.setTextColor(android.graphics.Color.WHITE)
-        openButton.setBackgroundColor(android.graphics.Color.rgb(0x5B, 0x7F, 0xB5))
+        openButton.setBackgroundColor(season.primary.toInt())
         openButton.visibility = android.view.View.GONE
         openButton.setOnClickListener { startComposeUi() }
         val params = android.widget.LinearLayout.LayoutParams(

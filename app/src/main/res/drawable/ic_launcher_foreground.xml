@@ -3,41 +3,88 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Retro-Comic-Einkaufsliste: Sticker-Karte mit hartem Schatten -->
+    <!-- Cozy Seasons Einkaufsliste: Weiche Karte + 4-Jahreszeiten-Akzente -->
+
+    <!-- Sanfter Himmels-/Heiligenschein-Kreis im Hintergrund -->
     <path
-        android:fillColor="#1D1D1B"
-        android:pathData="M36,30 h38 a9,9 0 0 1 9,9 v42 a9,9 0 0 1 -9,9 h-38 a9,9 0 0 1 -9,-9 v-42 a9,9 0 0 1 9,-9 z" />
+        android:fillColor="#F3E3C8"
+        android:fillAlpha="0.65"
+        android:pathData="M54,54 m-33,0 a33,33 0 1,0 66,0 a33,33 0 1,0 -66,0" />
+
+    <!-- 4 Saison-Partikel rund um die Karte (Safe-Zone 22..86) -->
+    <!-- Frühling: Rosa Blütenblatt oben links -->
     <path
-        android:fillColor="#FFFDF5"
-        android:strokeColor="#1D1D1B"
-        android:strokeWidth="3"
-        android:pathData="M31,25 h38 a9,9 0 0 1 9,9 v42 a9,9 0 0 1 -9,9 h-38 a9,9 0 0 1 -9,-9 v-42 a9,9 0 0 1 9,-9 z" />
+        android:fillColor="#E87A9E"
+        android:pathData="M24,33 C24,29.5 27.5,27 31,28.5 C32.5,32 29.5,35.5 26,35 C24.8,34.8 24,34 24,33 Z" />
+    <!-- Sommer: Warme Sonnenscheibe oben rechts -->
     <path
-        android:fillColor="#D62828"
-        android:pathData="M34,33 h32 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-32 a4,4 0 0 1 -4,-4 a4,4 0 0 1 4,-4 z" />
+        android:fillColor="#F2A93B"
+        android:pathData="M80,29 m-4.5,0 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0" />
+    <!-- Herbst: Blatt unten links -->
     <path
-        android:fillColor="#FFC800"
-        android:strokeColor="#1D1D1B"
-        android:strokeWidth="2.5"
-        android:pathData="M32,52 a6,6 0 1 0 12,0 a6,6 0 1 0 -12,0 z" />
+        android:fillColor="#7FA86B"
+        android:pathData="M23,74 Q27,69 32,73 Q28,78 23,74 Z" />
+    <!-- Winter: Eisblaue Schneeflocke unten rechts -->
     <path
-        android:strokeColor="#1D1D1B"
-        android:strokeWidth="2.5"
+        android:fillColor="#5B7FB5"
+        android:pathData="M81,75 m-3.5,0 a3.5,3.5 0 1,0 7,0 a3.5,3.5 0 1,0 -7,0" />
+
+    <!-- Weicher Cozy-Kartenschatten (Ink 12 %, nach unten rechts versetzt) -->
+    <path
+        android:fillColor="#224E362A"
+        android:pathData="M39,28 h34 a13,13 0 0 1 13,13 v34 a13,13 0 0 1 -13,13 h-34 a13,13 0 0 1 -13,-13 v-34 a13,13 0 0 1 13,-13 z" />
+
+    <!-- Weiße Cozy-Hauptkarte (Radius 13) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M37,25 h34 a13,13 0 0 1 13,13 v34 a13,13 0 0 1 -13,13 h-34 a13,13 0 0 1 -13,-13 v-34 a13,13 0 0 1 13,-13 z" />
+
+    <!-- Oberer Saison-Akzent (Kopf-Pille in Herbst-Terrakotta #C96F2F) -->
+    <path
+        android:fillColor="#C96F2F"
+        android:pathData="M37,33 h22 a3.5,3.5 0 0 1 3.5,3.5 a3.5,3.5 0 0 1 -3.5,3.5 h-22 a3.5,3.5 0 0 1 -3.5,-3.5 a3.5,3.5 0 0 1 3.5,-3.5 z" />
+    <!-- Kleiner Saison-Tag-Chip rechts daneben (Frühlingsrosa #E87A9E) -->
+    <path
+        android:fillColor="#FAD8E3"
+        android:pathData="M65,33 h7 a3.5,3.5 0 0 1 3.5,3.5 a3.5,3.5 0 0 1 -3.5,3.5 h-7 a3.5,3.5 0 0 1 -3.5,-3.5 a3.5,3.5 0 0 1 3.5,-3.5 z" />
+
+    <!-- Zeile 1: Abgehakter Cozy-Kreis mit rundem Häkchen -->
+    <path
+        android:fillColor="#FBE6D4"
+        android:pathData="M39,51 m-6.5,0 a6.5,6.5 0 1,0 13,0 a6.5,6.5 0 1,0 -13,0" />
+    <path
+        android:strokeColor="#C96F2F"
+        android:strokeWidth="2.6"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M35,52.5 l2.4,2.6 l4.4,-5" />
+        android:pathData="M36,51.2 l2.2,2.4 l4.3,-4.8" />
     <path
-        android:fillColor="#1D1D1B"
-        android:pathData="M50.5,49.5 h17 a2.5,2.5 0 0 1 2.5,2.5 a2.5,2.5 0 0 1 -2.5,2.5 h-17 a2.5,2.5 0 0 1 -2.5,-2.5 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+        android:fillColor="#4E362A"
+        android:pathData="M51,48.5 h21 a2.5,2.5 0 0 1 2.5,2.5 a2.5,2.5 0 0 1 -2.5,2.5 h-21 a2.5,2.5 0 0 1 -2.5,-2.5 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+
+    <!-- Zeile 2: Offener Cozy-Kreis (Sommer-Blaugrün #2E8FA8) -->
     <path
-        android:fillColor="#FFF6E5"
-        android:strokeColor="#1D1D1B"
-        android:strokeWidth="2.5"
-        android:pathData="M32,68 a6,6 0 1 0 12,0 a6,6 0 1 0 -12,0 z" />
+        android:fillColor="#E5F4F7"
+        android:strokeColor="#2E8FA8"
+        android:strokeWidth="2"
+        android:pathData="M39,66 m-5.5,0 a5.5,5.5 0 1,0 11,0 a5.5,5.5 0 1,0 -11,0" />
     <path
-        android:fillColor="#4A443A"
-        android:pathData="M50.5,65.5 h17 a2.5,2.5 0 0 1 2.5,2.5 a2.5,2.5 0 0 1 -2.5,2.5 h-17 a2.5,2.5 0 0 1 -2.5,-2.5 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+        android:fillColor="#4E362A"
+        android:pathData="M51,62.5 h17 a2.5,2.5 0 0 1 2.5,2.5 a2.5,2.5 0 0 1 -2.5,2.5 h-17 a2.5,2.5 0 0 1 -2.5,-2.5 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+    <!-- Mengenangabe-Subzeile in Soft-Ton -->
     <path
-        android:fillColor="#4A443A"
-        android:pathData="M32.5,78 h33 a2.5,2.5 0 0 1 2.5,2.5 a2.5,2.5 0 0 1 -2.5,2.5 h-33 a2.5,2.5 0 0 1 -2.5,-2.5 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+        android:fillColor="#8A6F5C"
+        android:fillAlpha="0.65"
+        android:pathData="M51,69.5 h11 a1.8,1.8 0 0 1 1.8,1.8 a1.8,1.8 0 0 1 -1.8,1.8 h-11 a1.8,1.8 0 0 1 -1.8,-1.8 a1.8,1.8 0 0 1 1.8,-1.8 z" />
+
+    <!-- Kleine schwebende FAB-Pille unten mittig auf der Karte -->
+    <path
+        android:fillColor="#C96F2F"
+        android:pathData="M46,79 h16 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-16 a4,4 0 0 1 -4,-4 a4,4 0 0 1 4,-4 z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M54,81 v4 M52,83 h4" />
 </vector>
+
