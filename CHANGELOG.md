@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.28 – 2026-11-18
+
+Behoben: Compose-Attach im ersten Frame-Fenster blockiert das Fenster auf Android 17.
+
+### Behoben
+- **Muster bestätigt**: Renderte die App immer, wenn Compose erst nach Nutzer-Interaktion startete (Diagnose-Knöpfe, Stufe 3); blieb sie weiß, sobald Compose während des App-Starts attached wurde – auch bei Verzögerung im selben ersten Frame-Fenster (v1.27). Auf Android 17 verhindert das frühzeitige Attach den allerersten Frame des Fensters dauerhaft
+- **Fix**: Der Ladebildschirm („EINKAUFSLISTE") wird per setContentView gesetzt und muss erst echte Frames rendern; Compose startet erst danach – wenn die Datenbank bereit ist UND mindestens 800 ms vergangen sind. Zusätzlich startet ein Tipp auf den Ladebildschirm die Oberfläche sofort (Auslöser nach Interaktion = nachweislich funktionierender Pfad)
+- Der Compose-Start ist idempotent geschützt (AtomicBoolean) und wird protokolliert
+
 ## v1.26.1 – 2026-11-18
 
 Nachbesserung: Weißer Bildschirm – erneutes Auftreten behoben (Race Condition).

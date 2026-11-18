@@ -18,24 +18,37 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         ReportLog.info("Startup", "MainActivity onCreate")
 
-        // Ladebildschirm (reine Views), bis die Datenbank bereit ist
-        setContentView(buildLoadingScreen())
+        // Ladebildschirm (reine Views) – muss erst sichtbar rendern,
+        // bevor Compose attached wird (Attach im ersten Frame-Fenster
+        // blockiert auf Android 17 das komplette Fenster).
+        val loadingScreen = buildLoadingScreen()
+        setContentView(loadingScreen)
+        ReportLog.info("Startup", "Ladebildschirm gesetzt")
 
         Thread {
-            // Maximal 3 Sekunden auf die DB-Vorwaermung warten, dann starten
+            // Auf DB-Vorwaermung warten (max. 3 Sekunden)
             (application as EinkaufslisteApp).dbReady.await(3, java.util.concurrent.TimeUnit.SECONDS)
             runOnUiThread {
-                ReportLog.info("Startup", "DB bereit (oder Timeout) – Compose wird gestartet")
-                setContent {
-                    EinkaufslisteTheme {
-                        Surface(modifier = Modifier.fillMaxSize()) {
-                            EinkaufslisteApp()
-                        }
-                    }
-                }
+                ReportLog.info("Startup", "DB bereit – Compose-Start geplant")
+                // Mehrere echte Frames des Ladebildschirms zulassen, dann Compose starten
+                loadingScreen.postDelayed({ startComposeUi() }, 800)
             }
         }.start()
     }
+
+    private fun startComposeUi() {
+        if (composeStarted.getAndSet(true)) return
+        ReportLog.info("Startup", "Compose wird gestartet")
+        setContent {
+            EinkaufslisteTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    EinkaufslisteApp()
+                }
+            }
+        }
+    }
+
+    private val composeStarted = java.util.concurrent.atomic.AtomicBoolean(false)
 
     /** Minimaler Ladebildschirm im Comic-Look (ohne Compose). */
     private fun buildLoadingScreen(): android.widget.TextView {
@@ -45,6 +58,7 @@ class MainActivity : ComponentActivity() {
         text.gravity = android.view.Gravity.CENTER
         text.setTextColor(android.graphics.Color.rgb(0xD6, 0x28, 0x28))
         text.setBackgroundColor(android.graphics.Color.rgb(0xFF, 0xF6, 0xE5))
+        text.setOnClickListener { startComposeUi() }
         return text
     }
 }
