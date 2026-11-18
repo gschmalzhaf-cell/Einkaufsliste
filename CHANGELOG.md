@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.25 – 2026-11-18
+
+Diagnose-Build: ViewModel-Erstellung präzise markieren, DB-Vorwärmung.
+
+### Neu
+- **Marken um die ViewModel-Erstellung**: „Stufe 3: ViewModel wird erstellt“ → „Stufe 3: ViewModel erstellt“ → „EinkaufslisteApp betreten“ – die letzte Marke zeigt, ob das Erstellen des ViewModels (inkl. Room-Zugriff auf dem Haupt-Thread) blockiert
+- **Datenbank-Vorwärmung**: Beim App-Start wird die Room-Datenbank sofort im Hintergrund initialisiert, damit der Haupt-Thread die Instanz nur noch vorfindet – als möglicher Fix, falls genau dieser Schritt hängt
+- Erkenntnisstand: In v1.24 erreichte die Komposition nicht einmal den ersten ListScreen-Marker – der Block liegt zwischen setContent und ListScreen-Beginn, also bei der ViewModel-Erstellung
+
 ## v1.24 – 2026-11-18
 
 Diagnose-Build: Bericht liest das persistente Protokoll.

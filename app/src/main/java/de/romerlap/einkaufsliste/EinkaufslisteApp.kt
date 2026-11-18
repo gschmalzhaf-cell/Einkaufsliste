@@ -19,6 +19,15 @@ class EinkaufslisteApp : Application() {
             }
             ReportLog.init(this)
             ReportLog.info("App", "Gestartet (Android ${android.os.Build.VERSION.RELEASE})")
+            // Datenbank im Hintergrund vorwaermen, damit der Haupt-Thread sie sofort vorfindet
+            Thread {
+                try {
+                    de.romerlap.einkaufsliste.data.AppDatabase.get(this)
+                    ReportLog.info("App", "Datenbank vorgewärmt")
+                } catch (e: Exception) {
+                    ReportLog.error("App", "DB-Vorwärmung: ${e.javaClass.simpleName}: ${e.message}")
+                }
+            }.start()
         } catch (e: Exception) {
             // Der App-Start darf an der Diagnose niemals scheitern
         }

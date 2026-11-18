@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import de.romerlap.einkaufsliste.data.AppDatabase
 import de.romerlap.einkaufsliste.ui.ListScreen
 import de.romerlap.einkaufsliste.ui.theme.EinkaufslisteTheme
@@ -93,7 +94,12 @@ class MainActivity : ComponentActivity() {
                             androidx.compose.material3.Text("Stufe 2 OK: Scaffold + TopAppBar")
                         }
                     }
-                    else -> EinkaufslisteApp()
+                    else -> {
+                        ReportLog.info("Startup", "Stufe 3: ViewModel wird erstellt")
+                        val vm = viewModel<ListViewModel>()
+                        ReportLog.info("Startup", "Stufe 3: ViewModel erstellt")
+                        EinkaufslisteApp(vm)
+                    }
                 }
             }
         }
@@ -220,5 +226,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun EinkaufslisteApp(viewModel: ListViewModel = viewModel()) {
+    ReportLog.info("Startup", "EinkaufslisteApp betreten (Startliste wird komponiert)")
     ListScreen(viewModel)
 }
