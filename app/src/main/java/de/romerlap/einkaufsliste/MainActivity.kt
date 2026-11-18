@@ -27,7 +27,8 @@ class MainActivity : ComponentActivity() {
 
         Thread {
             // Auf DB-Vorwaermung warten (max. 3 Sekunden)
-            (application as EinkaufslisteApp).dbReady.await(3, java.util.concurrent.TimeUnit.SECONDS)
+            val ok = (application as EinkaufslisteApp).dbReady.await(3, java.util.concurrent.TimeUnit.SECONDS)
+            ReportLog.info("Startup", "dbReady-Treffer: $ok")
             runOnUiThread {
                 ReportLog.info("Startup", "DB bereit – Compose-Start geplant")
                 // Mehrere echte Frames des Ladebildschirms zulassen, dann Compose starten
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
 
     private fun startComposeUi() {
         if (composeStarted.getAndSet(true)) return
-        ReportLog.info("Startup", "Compose wird gestartet")
+        ReportLog.info("Startup", "Compose wird gestartet (Thread ${Thread.currentThread().name})")
         setContent {
             EinkaufslisteTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {

@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import de.romerlap.einkaufsliste.ReportLog
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [ShoppingItem::class], version = 3, exportSchema = false)
@@ -28,8 +29,11 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        fun get(context: Context): AppDatabase =
-            instance ?: synchronized(this) {
+        fun get(context: Context): AppDatabase {
+            val existing = instance
+            if (existing != null) return existing
+            ReportLog.info("DB", "get(): keine Instanz, baue (Thread ${Thread.currentThread().name})")
+            return synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
@@ -37,7 +41,11 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
-                    .also { instance = it }
+                    .also {
+                        instance = it
+                        ReportLog.info("DB", "Instanz gebaut (Thread ${Thread.currentThread().name})")
+                    }
             }
+        }
     }
 }

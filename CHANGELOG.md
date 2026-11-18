@@ -3,6 +3,15 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v1.29 – 2026-11-18
+
+Diagnose-Build: Start-Kette vollstaendig protokollieren (Ladebildschirm rendert, Compose bleibt weiß).
+
+### Neu
+- **Marke in der Datenbank-Zugriffsschicht**: `AppDatabase.get()` protokolliert, ob die Instanz vorhanden war oder auf welchem Thread sie gebaut wurde – zeigt, ob der Haupt-Thread jemals selbst baut
+- **Latcherfolg protokolliert**: „dbReady-Treffer: true/false“ zeigt, ob die Vorwärmung rechtzeitig fertig war oder der 3-Sekunden-Timeout griff
+- **ListScreen-Marken 1–4 zurück**: Komposition betreten → Items abgerufen → vor Scaffold → Content abgeschlossen; die letzte Marke zeigt die Hang-Stelle
+
 ## v1.28 – 2026-11-18
 
 Behoben: Compose-Attach im ersten Frame-Fenster blockiert das Fenster auf Android 17.
