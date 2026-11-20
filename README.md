@@ -1,4 +1,4 @@
-# Einkaufsliste
+# Gideon's Einkaufsliste
 
 Eine einfache, private Android-Einkaufsliste für ein Gerät. Einträge können auf drei Arten ergänzt werden:
 
