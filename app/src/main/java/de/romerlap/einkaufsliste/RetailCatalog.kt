@@ -19,6 +19,23 @@ object RetailCatalog {
         return null
     }
 
+    /** Liefert passende Artikelvorschläge (Großgeschrieben) für Autocomplete beim Tippen. */
+    fun suggest(query: String, limit: Int = 5): List<String> {
+        val q = query.trim().lowercase()
+        if (q.length < 2) return emptyList()
+        val startsWith = mutableListOf<String>()
+        val contains = mutableListOf<String>()
+        for ((key, _) in entries) {
+            if (key == q) continue
+            val display = key.replaceFirstChar { it.uppercaseChar() }
+            when {
+                key.startsWith(q) -> startsWith += display
+                key.contains(q) -> contains += display
+            }
+        }
+        return (startsWith + contains).distinct().take(limit)
+    }
+
     private val entries = listOf(
         "eigelb" to "in einer 10er-Packung Eiern enthalten",
         "puderzucker" to "150 g / 500 g Puderzucker-Paket",

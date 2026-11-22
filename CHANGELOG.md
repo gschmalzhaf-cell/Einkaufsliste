@@ -3,6 +3,17 @@
 Alle Änderungen an der Einkaufsliste-App werden hier pro Version dokumentiert.
 Die GitHub-Release-Notes werden automatisch aus der obersten Version-Sektion dieser Datei erzeugt – der Changelog steht damit immer vollständig im jeweiligen Release-Tag.
 
+## v2.4.0 – 2026-11-22
+
+Neu: Smart-Shopping-Intelligenz – Supermarkt-Gang-Sortierung, Duplikat- & Mengen-Zusammenführung, Smart-Schnelleingabe, Autocomplete und KI-/Saison-Assistent.
+
+### Neu & Intelligenter
+- **Supermarkt-Gang-Sortierung (`AisleClassifier`)**: Artikel werden offline automatisch 11 deutschen Supermarkt-Abteilungen zugeordnet (🥬 Obst & Gemüse, 🥖 Backwaren, 🧀 Kühlregal, 🥩 Fleisch & Fisch, 🍝 Vorrat, 🧂 Backen & Gewürze, 🧊 Tiefkühl, 🥤 Getränke, 🍫 Snacks, 🧼 Haushalt, 📦 Sonstiges). Über das neue Laden-Symbol in der Kopfzeile lässt sich jederzeit zwischen Gang-Gruppierung und Standardansicht wechseln
+- **Intelligente Duplikat-Erkennung & Mengen-Addition (`QuantityMerger`)**: Wird ein bereits offener Artikel erneut hinzugefügt (manuell, per Rezept oder per KI), addiert die App kompatible Mengen automatisch (`200 g + 300 g = 500 g`, `500 ml + 1 l = 1,5 l`, `2 + 3 = 5`) statt doppelte Einträge anzulegen. Erledigte Duplikate werden automatisch wieder geöffnet
+- **Smart-Schnelleingabe (`SmartInputParser`) & Live-Autocomplete**: Eingaben wie `2 kg Kartoffeln #Sonntag` oder `3x Paprika` werden direkt in Artikelname, Menge, Tag, Abteilung und handelsübliche Packungsgröße zerlegt. Beim Tippen schlägt die App passende Artikel aus dem Katalog als 1-Tipp-Chips vor
+- **KI- & Saison-Assistent (`AiAssistSheet`)**: Neue Option im „Hinzufügen“-Menü – tippe einfach ein Gericht oder einen Anlass ein (z. B. *„Lasagne für 4 Personen“* oder *„Grillabend“*) und Mistral erstellt eine passende Liste inkl. Mengen, Packungsgrößen & Tag, wobei bereits offene Artikel auf deiner Liste berücksichtigt werden. Ohne API-Schlüssel stehen fertige Saison-Ideen & Wochen-Basics komplett offline bereit
+- **Dokumentation & Roadmap**: `README.md` grundlegend aktualisiert und um priorisierte Vorschläge für künftige Features & Optimierungen ergänzt
+
 ## v2.3.0 – 2026-11-19
 
 Neu: Einträge bearbeiten, Cozy-Seasons-App-Icon, sichtbare Mistral-KI-Persistenz & Design-Feinschliff.

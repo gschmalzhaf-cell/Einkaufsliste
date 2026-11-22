@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
@@ -82,10 +83,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import de.romerlap.einkaufsliste.AisleClassifier
 import de.romerlap.einkaufsliste.ApiKeyStore
 import de.romerlap.einkaufsliste.ListViewModel
 import de.romerlap.einkaufsliste.ReportLog
 import de.romerlap.einkaufsliste.data.ShoppingItem
+import de.romerlap.einkaufsliste.ui.AiAssistSheet
 import de.romerlap.einkaufsliste.ui.ApiKeyDialog
 import de.romerlap.einkaufsliste.ui.ManualAddDialog
 import de.romerlap.einkaufsliste.ui.PhotoResultSheet
@@ -103,6 +106,7 @@ import kotlin.math.sin
  * - Weiches Himmels-Band im oberen Drittel + Motion-Layer mit Saison-Partikeln
  * - Kamera-Loch als saisonaler Anker (pulsierender Ring um das Cutout)
  * - Einträge per Tipp auf Karte oder Stift-Icon bearbeitbar
+ * - Supermarkt-Gang-Sortierung (AisleClassifier) & KI-Einkaufsassistent
  * - Sichtbares KI-Badge + zuverlässige Persistenz des Mistral-API-Schlüssels
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -114,10 +118,12 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
 
     var selectedTags by rememberSaveable { mutableStateOf(listOf<String>()) }
     var untaggedSelected by rememberSaveable { mutableStateOf(false) }
+    var groupByAisle by rememberSaveable { mutableStateOf(true) }
     var showAddSheet by rememberSaveable { mutableStateOf(false) }
     var showManualDialog by rememberSaveable { mutableStateOf(false) }
     var editingItem by remember { mutableStateOf<ShoppingItem?>(null) }
     var showRecipeSheet by rememberSaveable { mutableStateOf(false) }
+    var showAiAssist by rememberSaveable { mutableStateOf(false) }
     var showSettings by rememberSaveable { mutableStateOf(false) }
     var showKeyDialog by rememberSaveable { mutableStateOf(false) }
     var showReport by rememberSaveable { mutableStateOf(false) }
@@ -314,6 +320,14 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                         }
                     }
                 }
+                // Supermarkt-Gang-Sortierung umschalten
+                IconButton(onClick = { groupByAisle = !groupByAisle }) {
+                    Icon(
+                        Icons.Filled.Storefront,
+                        contentDescription = if (groupByAisle) "Nach Gang sortiert (tippen für Standard)" else "Nach Supermarkt-Gang sortieren",
+                        tint = if (groupByAisle) season.primary else season.soft.copy(alpha = 0.6f)
+                    )
+                }
                 if (items.any { it.isChecked }) {
                     IconButton(onClick = {
                         burstTick++
@@ -393,18 +407,44 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                     }
                 }
                 if (open.isNotEmpty()) {
-                    item { SectionPill("Offen", open.size, season.secondary) }
-                    items(open, key = { it.id }) { item ->
-                        CozyCard(
-                            item = item,
-                            season = season,
-                            onToggle = {
-                                if (open.size == 1) burstTick++ // letzter offener Artikel: Liste geschafft!
-                                viewModel.toggle(item)
-                            },
-                            onEdit = { editingItem = item },
-                            onDelete = { viewModel.delete(item) }
-                        )
+                    if (groupByAisle) {
+                        val grouped = open
+                            .groupBy { AisleClassifier.classify(it.name) }
+                            .toList()
+                            .sortedBy { it.first.sortOrder }
+                        grouped.forEach { (aisle, aisleItems) ->
+                            item(key = "aisle_${aisle.name}") {
+                                SectionPill("${aisle.emoji} ${aisle.label}", aisleItems.size, season.secondary)
+                            }
+                            items(aisleItems, key = { it.id }) { item ->
+                                CozyCard(
+                                    item = item,
+                                    season = season,
+                                    showAisleEmoji = false,
+                                    onToggle = {
+                                        if (open.size == 1) burstTick++ // letzter offener Artikel: Liste geschafft!
+                                        viewModel.toggle(item)
+                                    },
+                                    onEdit = { editingItem = item },
+                                    onDelete = { viewModel.delete(item) }
+                                )
+                            }
+                        }
+                    } else {
+                        item { SectionPill("Offen", open.size, season.secondary) }
+                        items(open, key = { it.id }) { item ->
+                            CozyCard(
+                                item = item,
+                                season = season,
+                                showAisleEmoji = true,
+                                onToggle = {
+                                    if (open.size == 1) burstTick++ // letzter offener Artikel: Liste geschafft!
+                                    viewModel.toggle(item)
+                                },
+                                onEdit = { editingItem = item },
+                                onDelete = { viewModel.delete(item) }
+                            )
+                        }
                     }
                 }
                 if (done.isNotEmpty()) {
@@ -413,6 +453,7 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                         CozyCard(
                             item = item,
                             season = season,
+                            showAisleEmoji = false,
                             onToggle = { viewModel.toggle(item) },
                             onEdit = { editingItem = item },
                             onDelete = { viewModel.delete(item) }
@@ -446,7 +487,15 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
-            AddOption(Icons.Filled.Edit, "Manuell", "Eintrag selbst tippen") { showManualDialog = true; showAddSheet = false }
+            AddOption(Icons.Filled.Edit, "Manuell (Smart-Eingabe)", "z. B. „2 kg Kartoffeln #Sonntag“ tippen") {
+                showManualDialog = true; showAddSheet = false
+            }
+            AddOption(
+                Icons.Filled.AutoAwesome,
+                if (currentKey != null) "KI-Assistent (Gericht oder Anlass)" else "Saison- & Ideen-Assistent",
+                if (currentKey != null) "z. B. „Lasagne für 4“ – KI erstellt die passende Liste"
+                else "Fertige ${season.season.label}-Ideen & Wochen-Basics übernehmen"
+            ) { showAiAssist = true; showAddSheet = false }
             AddOption(
                 Icons.Filled.PhotoCamera,
                 "Per Foto",
@@ -461,6 +510,18 @@ fun HomeScreen(viewModel: ListViewModel = viewModel()) {
             ) { showRecipeSheet = true; showAddSheet = false }
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+    if (showAiAssist) {
+        AiAssistSheet(
+            season = season.season,
+            existingOpenItems = items.filter { !it.isChecked }.map { it.name },
+            existingTags = allTags,
+            onDismiss = { showAiAssist = false },
+            onAdd = { drafts ->
+                viewModel.addAll(drafts)
+                showAiAssist = false
+            }
+        )
     }
     if (showManualDialog) {
         ManualAddDialog(
@@ -679,6 +740,7 @@ private fun SectionPill(title: String, count: Int, color: Color) {
 private fun CozyCard(
     item: ShoppingItem,
     season: SeasonColors,
+    showAisleEmoji: Boolean = false,
     onToggle: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit
@@ -754,8 +816,13 @@ private fun CozyCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val displayName = if (showAisleEmoji) {
+                        "${AisleClassifier.classify(item.name).emoji} ${item.name}"
+                    } else {
+                        item.name
+                    }
                     Text(
-                        item.name,
+                        displayName,
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                         color = if (item.isChecked) season.soft else season.ink,
                         textDecoration = if (item.isChecked) TextDecoration.LineThrough else null,

@@ -91,6 +91,46 @@ object MistralApi {
             ?: throw MistralException("Keine Packungsgröße erhalten")
     }
 
+    data class SuggestionResult(
+        val suggestedTag: String?,
+        val items: List<ExtractedItem>
+    )
+
+    /**
+     * KI-Assistent: erstellt aus einer freien Idee (z. B. "Lasagne für 4 Personen" oder
+     * "Grillabend") eine Einkaufsliste inkl. Mengen, Packungsgrößen und Tag-Vorschlag.
+     * Berücksichtigt bereits offene Artikel auf der Liste, um Doppelkäufe zu vermeiden.
+     */
+    suspend fun suggestForPrompt(
+        idea: String,
+        seasonLabel: String,
+        existingOpenItems: List<String>,
+        apiKey: String
+    ): SuggestionResult {
+        val existingBlock = if (existingOpenItems.isEmpty()) {
+            ""
+        } else {
+            " Auf der Liste stehen bereits: ${existingOpenItems.take(25).joinToString(", ")}. " +
+                "Schlage nur Artikel vor, die zusätzlich benötigt werden (oder größere Mengen)."
+        }
+        val question = """
+            Du bist ein smarter Einkaufslisten-Assistent für deutsche Supermärkte (Rewe, Aldi).
+            Aktuelle Jahreszeit: $seasonLabel.
+            Der Nutzer plant: "$idea".$existingBlock
+            Erstelle eine praxisnahe, nicht überladene Einkaufsliste mit den wirklich nötigen Artikeln.
+            Antworte ausschließlich als JSON-Objekt im Format:
+            {"tag": "kurzer Tag ohne # (z. B. Lasagne)", "items": [{"name": "Artikel", "quantity": "Menge oder null", "retail_hint": "handelsübliche Packungsgröße bei Rewe/Aldi"}]}.
+        """.trimIndent().replace("\n", " ")
+
+        val content = JSONArray().apply {
+            put(JSONObject().put("type", "text").put("text", question))
+        }
+        val raw = requestRaw(content, apiKey)
+        val obj = JSONObject(raw)
+        val tag = obj.optString("tag").trim().removePrefix("#").takeIf { it.isNotEmpty() }
+        return SuggestionResult(suggestedTag = tag, items = parse(raw))
+    }
+
     private suspend fun requestRaw(content: JSONArray, apiKey: String): String =
         withContext(Dispatchers.IO) {
             val body = JSONObject().apply {
